@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Местоположение и устройство обнаруженно</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #00ff00;
+            text-align: left;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Изменено на column для лучшей адаптации */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box; /* Добавлено для лучшего контроля размеров */
+        }
+        .terminal {
+            width: 90%; /* Адаптивная ширина */
+            max-width: 600px;
+            padding: 10px;
+            border: 2px solid #00ff00;
+            background-color: #000;
+            white-space: pre-wrap;
+            box-sizing: border-box; /* Добавлено */
+        }
+        .container {
+            width: 90%; /* Адаптивная ширина */
+            max-width: 600px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            display: none;
+            color: #00ff00;
+            box-sizing: border-box; /* Добавлено */
+            margin-top: 20px; /* Отступ от терминала, если оба видны */
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ff3333;
+            text-align: center; /* Центрируем заголовок */
+        }
+        .container p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            word-wrap: break-word; /* Добавлено для переноса длинных строк */
+        }
+        .real-info {
+            color: #ff3333; /* Красный цвет для подлинной информации */
+        }
+
+        /* Медиа-запросы для лучшей адаптации на очень маленьких экранах */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .terminal, .container {
+                padding: 10px;
+                font-size: 0.9em; /* Уменьшаем шрифт на маленьких экранах */
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .container p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal" id="terminal-text"></div>
+    <div class="container" id="main-content">
+        <h1>Местоположение и устройство обнаруженно</h1>
+        <p id="vpn-ip">Внешний IP (VPN): Загрузка...</p>
+        <p id="vpn-geo">Местоположение по IP: Загрузка...</p>
+        <p class="real-info">Ваш подлинный IP: 78.26.128.41</p>
+        <p class="real-info">Подлинное местоположение: Украина, Одесская область, г. Одесса</p>
+        <p id="provider">Провайдер: Westelecom</p>
+        <p id="device">Ваше устройство: Загрузка...</p>
+        <p id="resolution">Расширение экрана: Загрузка...</p>
+        <p id="languages">Языки: Загрузка...</p>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal-text');
+        const mainContent = document.getElementById('main-content');
+        const messages = [
+            "root@unknown:~$ Initializing breach protocol...\n",
+            "Bypassing firewall... [SUCCESS]\n",
+            "Accessing mainframe... [SUCCESS]\n",
+            "Tracing IP address... [SUCCESS]\n",
+            "Resolving geolocation data... [SUCCESS]\n"
+        ];
+
+        let index = 0;
+        function typeWriter() {
+            if (index < messages.length) {
+                let i = 0;
+                const currentMessage = messages[index];
+                terminal.textContent = ''; // Clear for new line
+                const interval = setInterval(() => {
+                    if (i < currentMessage.length) {
+                        terminal.textContent += currentMessage.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        index++;
+                        setTimeout(typeWriter, 500); // Delay between messages
+                    }
+                }, 25); // Faster typing speed (25ms)
+            } else {
+                // Last message with progress
+                terminal.textContent += "Decrypting user data... ";
+                let progress = 1;
+                const progressInterval = setInterval(() => {
+                    if (progress <= 100) {
+                        terminal.textContent = `Decrypting user data... ${progress}% `;
+                        progress++;
+                    } else {
+                        clearInterval(progressInterval);
+                        terminal.textContent += "[SUCCESS]\n";
+                        setTimeout(() => {
+                            terminal.style.display = 'none';
+                            mainContent.style.display = 'block';
+                        }, 1000); // Delay before transitioning
+                    }
+                }, 30); // Progress speed
+            }
+        }
+
+        // Start the animation
+        typeWriter();
+
+        // Fetch IP and geolocation
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('vpn-ip').textContent = `Внешний IP (VPN): ${data.ip}`;
+                document.getElementById('vpn-geo').textContent = `Местоположение по IP: ${data.city}, ${data.region}, ${data.country_name}`;
+            })
+            .catch(error => {
+                document.getElementById('vpn-ip').textContent = 'Внешний IP (VPN): Не удалось загрузить';
+                document.getElementById('vpn-geo').textContent = 'Местоположение по IP: Не удалось загрузить'; // Исправлено: было "Подлинное местоположение"
+            });
+
+        // Detect device and OS
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let device = 'Неизвестное устройство';
+            
+            if (/android/i.test(ua)) {
+                const versionMatch = ua.match(/Android\s([\d.]+)/);
+                const version = versionMatch ? versionMatch[1] : '*****';
+                device = `Смартфон Android ${version} ******`;
+            } else if (/iPhone|iPad|iPod/i.test(ua)) {
+                const versionMatch = ua.match(/OS\s([\d_]+)/);
+                const version = versionMatch ? versionMatch[1].replace(/_/g, '.') : '*****';
+                device = `iPhone ${version}`;
+            } else if (/Windows/i.test(ua)) {
+                const versionMatch = ua.match(/Windows\sNT\s([\d.]+)/);
+                const version = versionMatch ? versionMatch[1] : '*****';
+                device = `ПК Windows (Windows NT ${version}; ${navigator.platform})`;
+            } else if (/Mac/i.test(ua)) {
+                device = `ПК MacOS ******`;
+            } else if (/Linux/i.test(ua)) { // Добавлено для Linux
+                device = `ПК Linux ******`;
+            } else if (/CrOS/i.test(ua)) { // Добавлено для Chrome OS
+                device = `Chromebook ******`;
+            }
+
+            return device;
+        }
+
+        // Get screen resolution
+        const resolution = `${window.screen.width}x${window.screen.height}`;
+
+        // Get browser languages
+        const languages = navigator.languages ? navigator.languages.join(', ') : navigator.language || 'Неизвестно';
+
+        // Update DOM with device info
+        document.getElementById('device').textContent = `Ваше устройство: ${getDeviceInfo()}`;
+        document.getElementById('resolution').textContent = `Расширение экрана: ${resolution}`;
+        document.getElementById('languages').textContent = `Языки: ${languages}`;
+    </script>
+</body>
+</html>
