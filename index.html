@@ -229,7 +229,7 @@
                 const ipData = await ipResponse.json();
                 info.publicIp = ipData.ip || 'Неизвестно';
             } catch (error) {
-                info.publicIp = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
+                info.publicIp = `Ошибка: ${error.message} заблочено`;
             }
 
             try {
@@ -242,7 +242,7 @@
                     info.ipLocation = `${geoData.city || 'Неизвестный город'}, ${geoData.region || 'Неизвестный регион'}, ${geoData.country_name || 'Неизвестная страна'} (ISP: ${geoData.org || 'Неизвестно'})`;
                 }
             } catch (error) {
-                info.ipLocation = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
+                info.ipLocation = `Ошибка: ${error.message} заблочено`;
             }
 
             if (includeGps) {
@@ -255,23 +255,23 @@
                                 const accuracy = position.coords.accuracy.toFixed(2);
                                 info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
                                 info.googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                                info.yandexMapsLink = `https://yandex.ru/maps/?ll=${lon},${lat}&z=15`; // Yandex uses lon,lat
+                                info.yandexMapsLink = `https://yandex.ru/maps/?ll=${lon},${lat}&z=15`;
                                 resolve();
                             },
                             (error) => {
                                 let errorMessageGeo;
                                 switch (error.code) {
                                     case error.PERMISSION_DENIED:
-                                        errorMessageGeo = "Доступ к GPS отклонен пользователем.";
+                                        errorMessageGeo = "GPS отклонен.";
                                         break;
                                     case error.POSITION_UNAVAILABLE:
-                                        errorMessageGeo = "Информация о местоположении недоступна.";
+                                        errorMessageGeo = "недоступно.";
                                         break;
                                     case error.TIMEOUT:
-                                        errorMessageGeo = "Таймаут получения местоположения.";
+                                        errorMessageGeo = "Таймаут.";
                                         break;
                                     default:
-                                        errorMessageGeo = "Неизвестная ошибка получения местоположения.";
+                                        errorMessageGeo = "Неизвестная ошибка.";
                                         break;
                                 }
                                 info.gpsLocation = `Ошибка: ${errorMessageGeo}`;
