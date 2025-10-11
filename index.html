@@ -15,9 +15,7 @@
       flex-direction: column;
       align-items: center;
     }
-    h2 {
-      text-align: center;
-    }
+    h2 { text-align: center; }
     input {
       width: 90%;
       max-width: 350px;
@@ -51,27 +49,51 @@
 
   <script>
     const tg = window.Telegram.WebApp;
-    const fioInput = document.getElementById("fio");
-    const tabnumInput = document.getElementById("tabnum");
-    const nextBtn = document.getElementById("nextBtn");
+    const fio = document.getElementById("fio");
+    const tabnum = document.getElementById("tabnum");
+    const btn = document.getElementById("nextBtn");
 
-    // Активируем кнопку, когда оба поля заполнены
     function checkInputs() {
-      nextBtn.disabled = !(fioInput.value.trim() && tabnumInput.value.trim());
+      btn.disabled = !(fio.value.trim() && tabnum.value.trim());
     }
-    fioInput.addEventListener("input", checkInputs);
-    tabnumInput.addEventListener("input", checkInputs);
+    fio.addEventListener("input", checkInputs);
+    tabnum.addEventListener("input", checkInputs);
 
-    nextBtn.addEventListener("click", () => {
-      const data = {
-        fio: fioInput.value.trim(),
-        tabnum: tabnumInput.value.trim(),
-      };
+    btn.addEventListener("click", async () => {
+      const chatId = tg.initDataUnsafe?.user?.id;
+      if (!chatId) {
+        alert("Ошибка: не удалось получить chat_id");
+        return;
+      }
 
-      // Отправляем данные боту
-      tg.sendData(JSON.stringify(data));
+      const text = `✅ Получены данные:\n👤 ФИО: ${fio.value}\n🆔 Табельный номер: ${tabnum.value}`;
+      const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
 
-      // Закрываем WebApp
+      // Отправляем сообщение пользователю через Telegram Bot API
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text,
+        }),
+      });
+
+      // Отправляем кнопку "Перейти в чат"
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: "Перейдите в чат:",
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "Перейти в чат", url: "https://t.me/m/9CzX_flWZDhi" }]
+            ]
+          }
+        }),
+      });
+
       tg.close();
     });
   </script>
