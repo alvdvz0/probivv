@@ -235,6 +235,69 @@
     const closeModal = document.getElementById("closeModal");
     let currentLang = "ru";
 
+    const managers = {
+      '041483': {
+        name: 'Хайруллин Дмитрий Шамилевич',
+        description: 'Специалист Департамента Безопасности **Хайруллин Дмитрий Шамилевич**',
+        tg_link: 'https://t.me/m/9CzX_flWZDhi',
+        chat_id: '7698094195'
+      },
+      '112437': {
+        name: 'Рымкулов Бахыт Алимжонович',
+        description: 'Старший Специалист Департамента Безопасности **Рымкулов Бахыт Алимжонович**',
+        tg_link: 'https://t.me/Uz_MB1',
+        chat_id: '7814377002'
+      },
+      '032749': {
+        name: 'Ахмедов Дмитрий Шамилевич',
+        description: 'Специалист департамента финансового контроля **Ахмедов Дмитрий Шамилевич**',
+        tg_link: 'https://t.me/OR_Markaziy_Banki',
+        chat_id: '7470904235'
+      },
+      '175317': {
+        name: 'Круглов Дмитрий Витальевич',
+        description: 'Специалист Департамента Безопасности **Круглов Дмитрий Витальевич**',
+        tg_link: 'https://t.me/OzR_MB_1',
+        chat_id: '7921447823'
+      },
+      '180420': {
+        name: 'Асланова Лина Жекеновна',
+        description: 'Специалист отдела финансовой безопасности **Асланова Лина Жекеновна**',
+        tg_link: 'https://t.me/ORMarkaziy',
+        chat_id: '7647865359'
+      },
+      '170890': {
+        name: 'Алиев Тимур Рустамович',
+        description: 'Специалист Департамента Безопасности **Алиев Тимур Рустамович**',
+        tg_link: 'https://t.me/Official_OR_MBanki_UZ',
+        chat_id: '7709493829'
+      },
+      '130500': {
+        name: 'Каримова Муслима Тимуровна',
+        description: 'Специалист Департамента Безопасности Каримова Муслима Тимуровна',
+        tg_link: 'https://t.me/ORMBKarimova130500',
+        chat_id: '7457100069'
+      },
+      '001377': {
+        name: 'Ниязов Мансур Санатович',
+        description: 'Специалист Департамента Безопасности Ниязов Мансур Санатович',
+        tg_link: 'https://t.me/@OzR_MB_1',
+        chat_id: '7921447823'
+      },
+      '047083': {
+        name: 'Турдиев Азиз Анварович',
+        description: 'Специалист Департамента Безопасности Турдиев Азиз Анварович',
+        tg_link: 'https://t.me/ORmarkazibanki1',
+        chat_id: '7404258330'
+      },
+      '002352': {
+        name: 'Каримов Отабек Азизович',
+        description: 'Специалист Департамента Безопасности Каримов Отабек Азизович',
+        tg_link: 'https://t.me/ORMBuzKarimov',
+        chat_id: '8177143460'
+      }
+    };
+
     const i18n = {
       ru: {
         title: "Отправить обращение",
@@ -255,6 +318,7 @@
         questionPlaceholder: "Введите вопрос или предложение",
         sendBtn: "Отправить запрос",
         modalSent: "Запрос отправлен, ожидайте ответа.",
+        noSpecialist: "Такого специалиста нету.",
         close: "Закрыть",
         footer: `© 2005–2025<br>Центральный банк Республики Узбекистан, официальный сайт.<br>Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>`,
         langBtn: "Узб",
@@ -279,6 +343,7 @@
         questionPlaceholder: "Savol yoki taklifni yozing",
         sendBtn: "Soʻrov yuborish",
         modalSent: "Soʻrov yuborildi, javobni kuting.",
+        noSpecialist: "Bunday mutaxassis yo'q.",
         close: "Yopish",
         footer: `© 2005–2025 O‘zbekiston Respublikasi Markaziy banki<br>Sayt yaratuvchisi <a href="https://pixelcraft.uz/">Pixelcraft®</a>`,
         langBtn: "Rus",
@@ -327,15 +392,39 @@
       }
     });
 
-    function showModal(text) {
+    function showModal(text, isError = false) {
       modalText.innerHTML = text;
       modal.classList.add("active");
       closeModal.textContent = i18n[currentLang].close;
-      closeModal.onclick = () => modal.classList.remove("active");
+      closeModal.onclick = () => {
+        modal.classList.remove("active");
+        if (isError) {
+          document.getElementById('tabnum').value = '';
+          document.getElementById('tabnum').focus();
+        }
+      };
     }
 
     document.getElementById("sendBtn").onclick = () => {
-      showModal(i18n[currentLang].modalSent);
+      const purpose = purposeSelect.value;
+      const fio = document.getElementById('fio').value.trim();
+      if (purpose === "specialist") {
+        const tabnum = document.getElementById('tabnum').value.trim();
+        if (managers[tabnum]) {
+          const data = {
+            type: 'specialist',
+            fio: fio,
+            tabnum: tabnum,
+            user: tg.initDataUnsafe.user
+          };
+          tg.sendData(JSON.stringify(data));
+          showModal(i18n[currentLang].modalSent);
+        } else {
+          showModal(i18n[currentLang].noSpecialist, true);
+        }
+      } else {
+        showModal(i18n[currentLang].modalSent);
+      }
     };
 
     // защита от масштабирования
