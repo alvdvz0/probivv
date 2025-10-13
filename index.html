@@ -18,15 +18,30 @@
       align-items: center;
       min-height: 100vh;
       -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
       user-select: none;
       overscroll-behavior: none;
       touch-action: manipulation;
     }
 
-    body * {
-      box-sizing: border-box;
+    body * { box-sizing: border-box; }
+
+    .logo-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .lang-toggle {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #003366;
+      padding: 4px 8px;
+      cursor: pointer;
+      user-select: none;
     }
 
     img.logo {
@@ -34,8 +49,6 @@
       height: auto;
       display: block;
       cursor: pointer;
-      margin: 0;
-      padding: 0;
     }
 
     .container {
@@ -94,9 +107,7 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #004a99;
-    }
+    button:hover { background-color: #004a99; }
 
     /* Модальное окно */
     .modal {
@@ -111,9 +122,7 @@
       z-index: 100;
     }
 
-    .modal.active {
-      visibility: visible;
-    }
+    .modal.active { visibility: visible; }
 
     .modal-content {
       background: white;
@@ -130,12 +139,6 @@
       margin-bottom: 20px;
     }
 
-    .modal-content button {
-      width: auto;
-      padding: 8px 18px;
-      font-size: 15px;
-    }
-
     footer {
       text-align: center;
       color: #003366;
@@ -149,68 +152,60 @@
       text-decoration: none;
       font-weight: 600;
     }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body oncontextmenu="return false;">
-  <!-- логотип -->
-  <img src="лого.jpg" class="logo" alt="ЦБ РУЗ" onclick="window.location.href='https://cbu.uz/ru/'">
+  <div class="logo-container">
+    <div class="lang-toggle" id="langToggle">Узб</div>
+    <img src="лого.jpg" class="logo" id="logo" alt="ЦБ РУЗ" onclick="window.location.href='https://cbu.uz/ru/'">
+  </div>
 
-  <!-- форма -->
   <div class="container">
-    <h2>Отправить обращение</h2>
+    <h2 id="title">Отправить обращение</h2>
 
-    <label>Территориальное подразделение</label>
+    <label id="territorial-label">Территориальное подразделение</label>
     <select disabled>
-      <option>Центральный аппарат ЦБ</option>
-      <option>Ташкентское областное управление</option>
-      <option>Самаркандское областное управление</option>
+      <option id="territorial-option">Центральный аппарат ЦБ</option>
     </select>
 
-    <label>Департамент</label>
+    <label id="department-label">Департамент</label>
     <select disabled>
-      <option>Департамент Безопасности</option>
-      <option>Департамент ИТ</option>
-      <option>Департамент финансового контроля</option>
+      <option id="department-option">Департамент Безопасности</option>
     </select>
 
-    <label>ФИО заявителя</label>
+    <label id="fio-label">ФИО заявителя</label>
     <input type="text" id="fio" placeholder="Введите ФИО">
 
-    <label>Цель обращения</label>
+    <label id="purpose-label">Цель обращения</label>
     <select id="purpose">
-      <option value="specialist">Связь со специалистом</option>
-      <option value="question">Задать вопрос</option>
-      <option value="support">Обращение в поддержку</option>
-      <option value="proposal">Предложения</option>
+      <option value="specialist" id="opt-specialist">Связь со специалистом</option>
+      <option value="question" id="opt-question">Задать вопрос</option>
+      <option value="support" id="opt-support">Обращение в поддержку</option>
+      <option value="proposal" id="opt-proposal">Предложения</option>
     </select>
 
     <div id="specialist-section" style="display:block;">
-      <label>Табельный номер специалиста</label>
-      <input type="text" id="tabnum" placeholder="Номер">
+      <label id="tabnum-label">Табельный номер специалиста</label>
+      <input type="text" id="tabnum" placeholder="Например: 041483">
     </div>
 
     <div id="question-section" style="display:none;">
-      <label>Укажите ваш вопрос</label>
+      <label id="question-label">Укажите ваш вопрос</label>
       <input type="text" id="question" placeholder="Введите ваш вопрос">
     </div>
 
     <button id="sendBtn">Отправить запрос</button>
   </div>
 
-  <!-- модальное окно -->
   <div class="modal" id="modal">
-    <div class="modal-content" id="modal-content">
-      <p id="modal-text">Запрос отправлен, ожидайте ответа</p>
+    <div class="modal-content">
+      <p id="modal-text">Запрос отправлен, ожидайте ответа.</p>
       <button id="closeModal">Закрыть</button>
     </div>
   </div>
 
-  <!-- футер -->
-  <footer>
+  <footer id="footer">
     © 2005–2025<br>
     Центральный банк Республики Узбекистан, официальный сайт.<br>
     Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
@@ -218,109 +213,122 @@
 
   <script>
     const tg = window.Telegram.WebApp;
-    const fioInput = document.getElementById('fio');
-    const tabnumInput = document.getElementById('tabnum');
-    const purposeSelect = document.getElementById('purpose');
-    const sendBtn = document.getElementById('sendBtn');
-    const modal = document.getElementById('modal');
-    const modalText = document.getElementById('modal-text');
-    const closeModal = document.getElementById('closeModal');
+    const langToggle = document.getElementById("langToggle");
+    const logo = document.getElementById("logo");
+    const modal = document.getElementById("modal");
+    const modalText = document.getElementById("modal-text");
+    const closeModal = document.getElementById("closeModal");
 
-    // запрет масштабирования
+    let currentLang = "ru";
+
+    const i18n = {
+      ru: {
+        title: "Отправить обращение",
+        territorialLabel: "Территориальное подразделение",
+        territorialOption: "Центральный аппарат ЦБ",
+        departmentLabel: "Департамент",
+        departmentOption: "Департамент Безопасности",
+        fioLabel: "ФИО заявителя",
+        fioPlaceholder: "Введите ФИО",
+        purposeLabel: "Цель обращения",
+        optSpecialist: "Связь со специалистом",
+        optQuestion: "Задать вопрос",
+        optSupport: "Обращение в поддержку",
+        optProposal: "Предложения",
+        tabnumLabel: "Табельный номер специалиста",
+        tabPlaceholder: "Например: 041483",
+        questionLabel: "Укажите ваш вопрос",
+        questionPlaceholder: "Введите ваш вопрос",
+        sendBtn: "Отправить запрос",
+        modalSent: "Запрос отправлен, ожидайте ответа.",
+        modalNoSpec: "❌ Специалиста с этим номером нет.",
+        modalAccepted: "Запрос принят ✔",
+        modalNoFio: "Пожалуйста, введите ФИО заявителя.",
+        close: "Закрыть",
+        footer: `© 2005–2025<br>Центральный банк Республики Узбекистан, официальный сайт.<br>Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>`,
+        langBtn: "Узб",
+        logo: "лого.jpg"
+      },
+      uz: {
+        title: "Murojaat yuborish",
+        territorialLabel: "Hududiy boshqarma",
+        territorialOption: "MBning Markaziy apparati",
+        departmentLabel: "Departament",
+        departmentOption: "Xavfsizlik departamenti",
+        fioLabel: "Ariza beruvchining F.I.Sh.",
+        fioPlaceholder: "F.I.Sh.ni kiriting",
+        purposeLabel: "Murojaat maqsadi",
+        optSpecialist: "Mutaxassis bilan bogʻlanish",
+        optQuestion: "Savol berish",
+        optSupport: "Qoʻllab-quvvatlash xizmatiga murojaat",
+        optProposal: "Takliflar",
+        tabnumLabel: "Mutaxassisning tabel raqami",
+        tabPlaceholder: "Tabel raqami",
+        questionLabel: "Savolingizni kiriting",
+        questionPlaceholder: "Savolni yozing",
+        sendBtn: "Soʻrov yuborish",
+        modalSent: "Soʻrov yuborildi, javobni kuting.",
+        modalNoSpec: "❌ Bunday raqamli mutaxassis topilmadi.",
+        modalAccepted: "Soʻrov qabul qilindi ✔",
+        modalNoFio: "Iltimos, ariza beruvchining F.I.Sh.ni kiriting.",
+        close: "Yopish",
+        footer: `© 2005–2025 O‘zbekiston Respublikasi Markaziy banki<br>Sayt yaratuvchisi <a href="https://pixelcraft.uz/">Pixelcraft®</a>`,
+        langBtn: "Rus",
+        logo: "лого1.jpg"
+      }
+    };
+
+    function applyLang(lang) {
+      const t = i18n[lang];
+      document.getElementById("title").innerHTML = t.title;
+      document.getElementById("territorial-label").innerHTML = t.territorialLabel;
+      document.getElementById("territorial-option").innerHTML = t.territorialOption;
+      document.getElementById("department-label").innerHTML = t.departmentLabel;
+      document.getElementById("department-option").innerHTML = t.departmentOption;
+      document.getElementById("fio-label").innerHTML = t.fioLabel;
+      document.getElementById("fio").placeholder = t.fioPlaceholder;
+      document.getElementById("purpose-label").innerHTML = t.purposeLabel;
+      document.getElementById("opt-specialist").innerHTML = t.optSpecialist;
+      document.getElementById("opt-question").innerHTML = t.optQuestion;
+      document.getElementById("opt-support").innerHTML = t.optSupport;
+      document.getElementById("opt-proposal").innerHTML = t.optProposal;
+      document.getElementById("tabnum-label").innerHTML = t.tabnumLabel;
+      document.getElementById("tabnum").placeholder = t.tabPlaceholder;
+      document.getElementById("question-label").innerHTML = t.questionLabel;
+      document.getElementById("question").placeholder = t.questionPlaceholder;
+      document.getElementById("sendBtn").innerHTML = t.sendBtn;
+      document.getElementById("footer").innerHTML = t.footer;
+      langToggle.textContent = t.langBtn;
+      logo.src = t.logo;
+      currentLang = lang;
+    }
+
+    langToggle.addEventListener("click", () => {
+      const next = currentLang === "ru" ? "uz" : "ru";
+      applyLang(next);
+    });
+
+    // Запрещаем масштабирование
     document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault());
     document.addEventListener('gesturechange', e => e.preventDefault());
     document.addEventListener('gestureend', e => e.preventDefault());
 
-    // список специалистов
-    const managers = {
-      "041483": {
-        fio: "Хайруллин Дмитрий Шамилевич",
-        title: "Специалист Департамента Безопасности **Хайруллин Дмитрий Шамилевич**",
-        link: "https://t.me/m/9CzX_flWZDhi",
-        chat_id: 7698094195
-      },
-      "112437": {
-        fio: "Рымкулов Бахыт Алимжонович",
-        title: "Старший Специалист Департамента Безопасности **Рымкулов Бахыт Алимжонович**",
-        link: "https://t.me/Uz_MB1",
-        chat_id: 7814377002
-      },
-    };
-
-    const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
-
-    purposeSelect.addEventListener("change", () => {
-      const purpose = purposeSelect.value;
-      document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
-      document.getElementById("question-section").style.display = purpose === "specialist" ? "none" : "block";
-    });
-
-    sendBtn.addEventListener("click", async () => {
-      const fio = fioInput.value.trim();
-      const tab = tabnumInput.value.trim();
-      const purpose = purposeSelect.value;
-      const client = tg.initDataUnsafe?.user;
-
-      if (!fio) return showModal("Пожалуйста, введите ФИО заявителя.");
-
-      if (purpose !== "specialist") {
-        showModal("Запрос отправлен, ожидайте ответа.", () => {
-          window.location.href = "https://cbu.uz/ru/";
-        });
-        return;
-      }
-
-      if (!managers[tab]) {
-        showModal("❌ Специалиста с этим номером нет.", () => tabnumInput.focus());
-        return;
-      }
-
-      const manager = managers[tab];
-      const clientName = `${client?.first_name || ""} ${client?.last_name || ""}`.trim();
-      const username = client?.username ? `@${client.username}` : "—";
-
-      const textForManager =
-        `📨 Новая заявка!\n` +
-        `👤 ФИО (из формы): ${fio}\n` +
-        `👤 ФИО (в Telegram): ${clientName}\n` +
-        `🌐 Username: ${username}\n` +
-        `🆔 Chat ID: <code>${client?.id}</code>`;
-
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: manager.chat_id,
-          text: textForManager,
-          parse_mode: "HTML"
-        })
-      });
-
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: client.id,
-          text: manager.title,
-          parse_mode: "Markdown",
-          reply_markup: {
-            inline_keyboard: [[{ text: "Перейти в чат", url: manager.link }]]
-          }
-        })
-      });
-
-      showModal("Запрос принят ✔", () => tg.close());
-    });
-
+    // Модалка
     function showModal(text, onClose) {
-      modalText.textContent = text;
+      modalText.innerHTML = text;
       modal.classList.add("active");
+      closeModal.textContent = i18n[currentLang].close;
       closeModal.onclick = () => {
         modal.classList.remove("active");
         if (onClose) onClose();
       };
     }
+
+    // Пример обработчика кнопки (можно интегрировать с Telegram API)
+    document.getElementById("sendBtn").onclick = () => {
+      showModal(i18n[currentLang].modalSent);
+    };
   </script>
 </body>
 </html>
