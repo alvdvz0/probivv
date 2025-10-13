@@ -17,7 +17,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      -webkit-user-select: none; /* запрет выделения текста */
+      -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
@@ -135,13 +135,31 @@
       padding: 8px 18px;
       font-size: 15px;
     }
+
+    footer {
+      text-align: center;
+      color: #003366;
+      font-size: 13px;
+      margin: 25px 10px 15px;
+      line-height: 1.5;
+    }
+
+    footer a {
+      color: #003366;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
-  <a href="https://cbu.uz/ru/" target="_blank">
-    <img src="лого.jpg" class="logo" alt="ЦБ РУЗ">
-  </a>
+  <!-- логотип -->
+  <img src="лого.jpg" class="logo" alt="ЦБ РУЗ" onclick="window.location.href='https://cbu.uz/ru/'">
 
+  <!-- форма -->
   <div class="container">
     <h2>Отправить обращение</h2>
 
@@ -183,13 +201,20 @@
     <button id="sendBtn">Отправить запрос</button>
   </div>
 
-  <!-- Модальное окно -->
+  <!-- модальное окно -->
   <div class="modal" id="modal">
     <div class="modal-content" id="modal-content">
       <p id="modal-text">Запрос отправлен, ожидайте ответа</p>
       <button id="closeModal">Закрыть</button>
     </div>
   </div>
+
+  <!-- футер -->
+  <footer>
+    © 2005–2025<br>
+    Центральный банк Республики Узбекистан, официальный сайт.<br>
+    Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
+  </footer>
 
   <script>
     const tg = window.Telegram.WebApp;
@@ -201,16 +226,13 @@
     const modalText = document.getElementById('modal-text');
     const closeModal = document.getElementById('closeModal');
 
-    // Запрещаем масштабирование (Ctrl+колесо, pinch zoom)
-    document.addEventListener('wheel', e => {
-      if (e.ctrlKey) e.preventDefault();
-    }, { passive: false });
-
+    // запрет масштабирования
+    document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault());
     document.addEventListener('gesturechange', e => e.preventDefault());
     document.addEventListener('gestureend', e => e.preventDefault());
 
-    // Список специалистов
+    // список специалистов
     const managers = {
       "041483": {
         fio: "Хайруллин Дмитрий Шамилевич",
@@ -228,7 +250,6 @@
 
     const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
 
-    // Переключение формы
     purposeSelect.addEventListener("change", () => {
       const purpose = purposeSelect.value;
       document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
