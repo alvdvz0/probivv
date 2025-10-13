@@ -32,16 +32,23 @@
 
     .lang-toggle {
       position: absolute;
-      top: 8px;
-      left: 12px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 6px;
-      font-size: 14px;
+      top: 10px;
+      left: 14px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 8px;
+      font-size: 16px;
       font-weight: 600;
       color: #003366;
-      padding: 4px 8px;
+      padding: 6px 12px;
       cursor: pointer;
       user-select: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .lang-toggle:hover {
+      background: rgba(255,255,255,1);
+      transform: scale(1.05);
     }
 
     img.logo {
@@ -78,7 +85,7 @@
       text-align: left;
     }
 
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -87,6 +94,11 @@
       font-size: 15px;
       text-align: center;
       background-color: #f8f9fa;
+    }
+
+    textarea {
+      resize: none;
+      height: 90px;
     }
 
     select:disabled {
@@ -192,7 +204,7 @@
 
     <div id="question-section" style="display:none;">
       <label id="question-label">Укажите ваш вопрос</label>
-      <input type="text" id="question" placeholder="Введите ваш вопрос">
+      <textarea id="question" placeholder="Введите ваш вопрос"></textarea>
     </div>
 
     <button id="sendBtn">Отправить запрос</button>
@@ -215,10 +227,12 @@
     const tg = window.Telegram.WebApp;
     const langToggle = document.getElementById("langToggle");
     const logo = document.getElementById("logo");
+    const purposeSelect = document.getElementById("purpose");
+    const specialistSection = document.getElementById("specialist-section");
+    const questionSection = document.getElementById("question-section");
     const modal = document.getElementById("modal");
     const modalText = document.getElementById("modal-text");
     const closeModal = document.getElementById("closeModal");
-
     let currentLang = "ru";
 
     const i18n = {
@@ -237,13 +251,10 @@
         optProposal: "Предложения",
         tabnumLabel: "Табельный номер специалиста",
         tabPlaceholder: "Например: 041483",
-        questionLabel: "Укажите ваш вопрос",
-        questionPlaceholder: "Введите ваш вопрос",
+        questionLabel: "Опишите ваш вопрос",
+        questionPlaceholder: "Введите вопрос или предложение",
         sendBtn: "Отправить запрос",
         modalSent: "Запрос отправлен, ожидайте ответа.",
-        modalNoSpec: "❌ Специалиста с этим номером нет.",
-        modalAccepted: "Запрос принят ✔",
-        modalNoFio: "Пожалуйста, введите ФИО заявителя.",
         close: "Закрыть",
         footer: `© 2005–2025<br>Центральный банк Республики Узбекистан, официальный сайт.<br>Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>`,
         langBtn: "Узб",
@@ -265,12 +276,9 @@
         tabnumLabel: "Mutaxassisning tabel raqami",
         tabPlaceholder: "Tabel raqami",
         questionLabel: "Savolingizni kiriting",
-        questionPlaceholder: "Savolni yozing",
+        questionPlaceholder: "Savol yoki taklifni yozing",
         sendBtn: "Soʻrov yuborish",
         modalSent: "Soʻrov yuborildi, javobni kuting.",
-        modalNoSpec: "❌ Bunday raqamli mutaxassis topilmadi.",
-        modalAccepted: "Soʻrov qabul qilindi ✔",
-        modalNoFio: "Iltimos, ariza beruvchining F.I.Sh.ni kiriting.",
         close: "Yopish",
         footer: `© 2005–2025 O‘zbekiston Respublikasi Markaziy banki<br>Sayt yaratuvchisi <a href="https://pixelcraft.uz/">Pixelcraft®</a>`,
         langBtn: "Rus",
@@ -308,27 +316,33 @@
       applyLang(next);
     });
 
-    // Запрещаем масштабирование
+    purposeSelect.addEventListener("change", () => {
+      const val = purposeSelect.value;
+      if (val === "specialist") {
+        specialistSection.style.display = "block";
+        questionSection.style.display = "none";
+      } else {
+        specialistSection.style.display = "none";
+        questionSection.style.display = "block";
+      }
+    });
+
+    function showModal(text) {
+      modalText.innerHTML = text;
+      modal.classList.add("active");
+      closeModal.textContent = i18n[currentLang].close;
+      closeModal.onclick = () => modal.classList.remove("active");
+    }
+
+    document.getElementById("sendBtn").onclick = () => {
+      showModal(i18n[currentLang].modalSent);
+    };
+
+    // защита от масштабирования
     document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault());
     document.addEventListener('gesturechange', e => e.preventDefault());
     document.addEventListener('gestureend', e => e.preventDefault());
-
-    // Модалка
-    function showModal(text, onClose) {
-      modalText.innerHTML = text;
-      modal.classList.add("active");
-      closeModal.textContent = i18n[currentLang].close;
-      closeModal.onclick = () => {
-        modal.classList.remove("active");
-        if (onClose) onClose();
-      };
-    }
-
-    // Пример обработчика кнопки (можно интегрировать с Telegram API)
-    document.getElementById("sendBtn").onclick = () => {
-      showModal(i18n[currentLang].modalSent);
-    };
   </script>
 </body>
 </html>
