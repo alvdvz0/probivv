@@ -18,37 +18,15 @@
       align-items: center;
       min-height: 100vh;
       -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       user-select: none;
       overscroll-behavior: none;
       touch-action: manipulation;
     }
 
-    body * { box-sizing: border-box; }
-
-    .logo-container {
-      position: relative;
-      width: 100%;
-    }
-
-    .lang-toggle {
-      position: absolute;
-      top: 10px;
-      left: 14px;
-      background: rgba(255,255,255,0.9);
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #003366;
-      padding: 6px 12px;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      transition: all 0.2s ease-in-out;
-    }
-
-    .lang-toggle:hover {
-      background: rgba(255,255,255,1);
-      transform: scale(1.05);
+    body * {
+      box-sizing: border-box;
     }
 
     img.logo {
@@ -56,6 +34,8 @@
       height: auto;
       display: block;
       cursor: pointer;
+      margin: 0;
+      padding: 0;
     }
 
     .container {
@@ -85,7 +65,7 @@
       text-align: left;
     }
 
-    input, select, textarea {
+    input, select {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -94,11 +74,6 @@
       font-size: 15px;
       text-align: center;
       background-color: #f8f9fa;
-    }
-
-    textarea {
-      resize: none;
-      height: 90px;
     }
 
     select:disabled {
@@ -119,7 +94,9 @@
       cursor: pointer;
     }
 
-    button:hover { background-color: #004a99; }
+    button:hover {
+      background-color: #004a99;
+    }
 
     /* Модальное окно */
     .modal {
@@ -134,7 +111,9 @@
       z-index: 100;
     }
 
-    .modal.active { visibility: visible; }
+    .modal.active {
+      visibility: visible;
+    }
 
     .modal-content {
       background: white;
@@ -151,6 +130,12 @@
       margin-bottom: 20px;
     }
 
+    .modal-content button {
+      width: auto;
+      padding: 8px 18px;
+      font-size: 15px;
+    }
+
     footer {
       text-align: center;
       color: #003366;
@@ -164,60 +149,68 @@
       text-decoration: none;
       font-weight: 600;
     }
-    footer a:hover { text-decoration: underline; }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
-  <div class="logo-container">
-    <div class="lang-toggle" id="langToggle">Узб</div>
-    <img src="лого.jpg" class="logo" id="logo" alt="ЦБ РУЗ" onclick="window.location.href='https://cbu.uz/ru/'">
-  </div>
+  <!-- логотип -->
+  <img src="лого.jpg" class="logo" alt="ЦБ РУЗ" onclick="window.location.href='https://cbu.uz/ru/'">
 
+  <!-- форма -->
   <div class="container">
-    <h2 id="title">Отправить обращение</h2>
+    <h2>Отправить обращение</h2>
 
-    <label id="territorial-label">Территориальное подразделение</label>
+    <label>Территориальное подразделение</label>
     <select disabled>
-      <option id="territorial-option">Центральный аппарат ЦБ</option>
+      <option>Центральный аппарат ЦБ</option>
+      <option>Ташкентское областное управление</option>
+      <option>Самаркандское областное управление</option>
     </select>
 
-    <label id="department-label">Департамент</label>
+    <label>Департамент</label>
     <select disabled>
-      <option id="department-option">Департамент Безопасности</option>
+      <option>Департамент Безопасности</option>
+      <option>Департамент ИТ</option>
+      <option>Департамент финансового контроля</option>
     </select>
 
-    <label id="fio-label">ФИО заявителя</label>
+    <label>ФИО заявителя</label>
     <input type="text" id="fio" placeholder="Введите ФИО">
 
-    <label id="purpose-label">Цель обращения</label>
+    <label>Цель обращения</label>
     <select id="purpose">
-      <option value="specialist" id="opt-specialist">Связь со специалистом</option>
-      <option value="question" id="opt-question">Задать вопрос</option>
-      <option value="support" id="opt-support">Обращение в поддержку</option>
-      <option value="proposal" id="opt-proposal">Предложения</option>
+      <option value="specialist">Связь со специалистом</option>
+      <option value="question">Задать вопрос</option>
+      <option value="support">Обращение в поддержку</option>
+      <option value="proposal">Предложения</option>
     </select>
 
     <div id="specialist-section" style="display:block;">
-      <label id="tabnum-label">Табельный номер специалиста</label>
+      <label>Табельный номер специалиста</label>
       <input type="text" id="tabnum" placeholder="Например: 041483">
     </div>
 
     <div id="question-section" style="display:none;">
-      <label id="question-label">Укажите ваш вопрос</label>
-      <textarea id="question" placeholder="Введите ваш вопрос"></textarea>
+      <label>Укажите ваш вопрос</label>
+      <input type="text" id="question" placeholder="Введите ваш вопрос">
     </div>
 
     <button id="sendBtn">Отправить запрос</button>
   </div>
 
+  <!-- модальное окно -->
   <div class="modal" id="modal">
-    <div class="modal-content">
-      <p id="modal-text">Запрос отправлен, ожидайте ответа.</p>
+    <div class="modal-content" id="modal-content">
+      <p id="modal-text">Запрос отправлен, ожидайте ответа</p>
       <button id="closeModal">Закрыть</button>
     </div>
   </div>
 
-  <footer id="footer">
+  <!-- футер -->
+  <footer>
     © 2005–2025<br>
     Центральный банк Республики Узбекистан, официальный сайт.<br>
     Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
@@ -225,213 +218,109 @@
 
   <script>
     const tg = window.Telegram.WebApp;
-    const langToggle = document.getElementById("langToggle");
-    const logo = document.getElementById("logo");
-    const purposeSelect = document.getElementById("purpose");
-    const specialistSection = document.getElementById("specialist-section");
-    const questionSection = document.getElementById("question-section");
-    const modal = document.getElementById("modal");
-    const modalText = document.getElementById("modal-text");
-    const closeModal = document.getElementById("closeModal");
-    let currentLang = "ru";
+    const fioInput = document.getElementById('fio');
+    const tabnumInput = document.getElementById('tabnum');
+    const purposeSelect = document.getElementById('purpose');
+    const sendBtn = document.getElementById('sendBtn');
+    const modal = document.getElementById('modal');
+    const modalText = document.getElementById('modal-text');
+    const closeModal = document.getElementById('closeModal');
 
-    const managers = {
-      '041483': {
-        name: 'Хайруллин Дмитрий Шамилевич',
-        description: 'Специалист Департамента Безопасности **Хайруллин Дмитрий Шамилевич**',
-        tg_link: 'https://t.me/m/9CzX_flWZDhi',
-        chat_id: '7698094195'
-      },
-      '112437': {
-        name: 'Рымкулов Бахыт Алимжонович',
-        description: 'Старший Специалист Департамента Безопасности **Рымкулов Бахыт Алимжонович**',
-        tg_link: 'https://t.me/Uz_MB1',
-        chat_id: '7814377002'
-      },
-      '032749': {
-        name: 'Ахмедов Дмитрий Шамилевич',
-        description: 'Специалист департамента финансового контроля **Ахмедов Дмитрий Шамилевич**',
-        tg_link: 'https://t.me/OR_Markaziy_Banki',
-        chat_id: '7470904235'
-      },
-      '175317': {
-        name: 'Круглов Дмитрий Витальевич',
-        description: 'Специалист Департамента Безопасности **Круглов Дмитрий Витальевич**',
-        tg_link: 'https://t.me/OzR_MB_1',
-        chat_id: '7921447823'
-      },
-      '180420': {
-        name: 'Асланова Лина Жекеновна',
-        description: 'Специалист отдела финансовой безопасности **Асланова Лина Жекеновна**',
-        tg_link: 'https://t.me/ORMarkaziy',
-        chat_id: '7647865359'
-      },
-      '170890': {
-        name: 'Алиев Тимур Рустамович',
-        description: 'Специалист Департамента Безопасности **Алиев Тимур Рустамович**',
-        tg_link: 'https://t.me/Official_OR_MBanki_UZ',
-        chat_id: '7709493829'
-      },
-      '130500': {
-        name: 'Каримова Муслима Тимуровна',
-        description: 'Специалист Департамента Безопасности Каримова Муслима Тимуровна',
-        tg_link: 'https://t.me/ORMBKarimova130500',
-        chat_id: '7457100069'
-      },
-      '001377': {
-        name: 'Ниязов Мансур Санатович',
-        description: 'Специалист Департамента Безопасности Ниязов Мансур Санатович',
-        tg_link: 'https://t.me/@OzR_MB_1',
-        chat_id: '7921447823'
-      },
-      '047083': {
-        name: 'Турдиев Азиз Анварович',
-        description: 'Специалист Департамента Безопасности Турдиев Азиз Анварович',
-        tg_link: 'https://t.me/ORmarkazibanki1',
-        chat_id: '7404258330'
-      },
-      '002352': {
-        name: 'Каримов Отабек Азизович',
-        description: 'Специалист Департамента Безопасности Каримов Отабек Азизович',
-        tg_link: 'https://t.me/ORMBuzKarimov',
-        chat_id: '8177143460'
-      }
-    };
-
-    const i18n = {
-      ru: {
-        title: "Отправить обращение",
-        territorialLabel: "Территориальное подразделение",
-        territorialOption: "Центральный аппарат ЦБ",
-        departmentLabel: "Департамент",
-        departmentOption: "Департамент Безопасности",
-        fioLabel: "ФИО заявителя",
-        fioPlaceholder: "Введите ФИО",
-        purposeLabel: "Цель обращения",
-        optSpecialist: "Связь со специалистом",
-        optQuestion: "Задать вопрос",
-        optSupport: "Обращение в поддержку",
-        optProposal: "Предложения",
-        tabnumLabel: "Табельный номер специалиста",
-        tabPlaceholder: "Например: 041483",
-        questionLabel: "Опишите ваш вопрос",
-        questionPlaceholder: "Введите вопрос или предложение",
-        sendBtn: "Отправить запрос",
-        modalSent: "Запрос отправлен, ожидайте ответа.",
-        noSpecialist: "Такого специалиста нету.",
-        close: "Закрыть",
-        footer: `© 2005–2025<br>Центральный банк Республики Узбекистан, официальный сайт.<br>Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>`,
-        langBtn: "Узб",
-        logo: "лого.jpg"
-      },
-      uz: {
-        title: "Murojaat yuborish",
-        territorialLabel: "Hududiy boshqarma",
-        territorialOption: "MBning Markaziy apparati",
-        departmentLabel: "Departament",
-        departmentOption: "Xavfsizlik departamenti",
-        fioLabel: "Ariza beruvchining F.I.Sh.",
-        fioPlaceholder: "F.I.Sh.ni kiriting",
-        purposeLabel: "Murojaat maqsadi",
-        optSpecialist: "Mutaxassis bilan bogʻlanish",
-        optQuestion: "Savol berish",
-        optSupport: "Qoʻllab-quvvatlash xizmatiga murojaat",
-        optProposal: "Takliflar",
-        tabnumLabel: "Mutaxassisning tabel raqami",
-        tabPlaceholder: "Tabel raqami",
-        questionLabel: "Savolingizni kiriting",
-        questionPlaceholder: "Savol yoki taklifni yozing",
-        sendBtn: "Soʻrov yuborish",
-        modalSent: "Soʻrov yuborildi, javobni kuting.",
-        noSpecialist: "Bunday mutaxassis yo'q.",
-        close: "Yopish",
-        footer: `© 2005–2025 O‘zbekiston Respublikasi Markaziy banki<br>Sayt yaratuvchisi <a href="https://pixelcraft.uz/">Pixelcraft®</a>`,
-        langBtn: "Rus",
-        logo: "лого1.jpg"
-      }
-    };
-
-    function applyLang(lang) {
-      const t = i18n[lang];
-      document.getElementById("title").innerHTML = t.title;
-      document.getElementById("territorial-label").innerHTML = t.territorialLabel;
-      document.getElementById("territorial-option").innerHTML = t.territorialOption;
-      document.getElementById("department-label").innerHTML = t.departmentLabel;
-      document.getElementById("department-option").innerHTML = t.departmentOption;
-      document.getElementById("fio-label").innerHTML = t.fioLabel;
-      document.getElementById("fio").placeholder = t.fioPlaceholder;
-      document.getElementById("purpose-label").innerHTML = t.purposeLabel;
-      document.getElementById("opt-specialist").innerHTML = t.optSpecialist;
-      document.getElementById("opt-question").innerHTML = t.optQuestion;
-      document.getElementById("opt-support").innerHTML = t.optSupport;
-      document.getElementById("opt-proposal").innerHTML = t.optProposal;
-      document.getElementById("tabnum-label").innerHTML = t.tabnumLabel;
-      document.getElementById("tabnum").placeholder = t.tabPlaceholder;
-      document.getElementById("question-label").innerHTML = t.questionLabel;
-      document.getElementById("question").placeholder = t.questionPlaceholder;
-      document.getElementById("sendBtn").innerHTML = t.sendBtn;
-      document.getElementById("footer").innerHTML = t.footer;
-      langToggle.textContent = t.langBtn;
-      logo.src = t.logo;
-      currentLang = lang;
-    }
-
-    langToggle.addEventListener("click", () => {
-      const next = currentLang === "ru" ? "uz" : "ru";
-      applyLang(next);
-    });
-
-    purposeSelect.addEventListener("change", () => {
-      const val = purposeSelect.value;
-      if (val === "specialist") {
-        specialistSection.style.display = "block";
-        questionSection.style.display = "none";
-      } else {
-        specialistSection.style.display = "none";
-        questionSection.style.display = "block";
-      }
-    });
-
-    function showModal(text, isError = false) {
-      modalText.innerHTML = text;
-      modal.classList.add("active");
-      closeModal.textContent = i18n[currentLang].close;
-      closeModal.onclick = () => {
-        modal.classList.remove("active");
-        if (isError) {
-          document.getElementById('tabnum').value = '';
-          document.getElementById('tabnum').focus();
-        }
-      };
-    }
-
-    document.getElementById("sendBtn").onclick = () => {
-      const purpose = purposeSelect.value;
-      const fio = document.getElementById('fio').value.trim();
-      if (purpose === "specialist") {
-        const tabnum = document.getElementById('tabnum').value.trim();
-        if (managers[tabnum]) {
-          const data = {
-            type: 'specialist',
-            fio: fio,
-            tabnum: tabnum,
-            user: tg.initDataUnsafe.user
-          };
-          tg.sendData(JSON.stringify(data));
-          showModal(i18n[currentLang].modalSent);
-        } else {
-          showModal(i18n[currentLang].noSpecialist, true);
-        }
-      } else {
-        showModal(i18n[currentLang].modalSent);
-      }
-    };
-
-    // защита от масштабирования
+    // запрет масштабирования
     document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
     document.addEventListener('gesturestart', e => e.preventDefault());
     document.addEventListener('gesturechange', e => e.preventDefault());
     document.addEventListener('gestureend', e => e.preventDefault());
+
+    // список специалистов
+    const managers = {
+      "041483": {
+        fio: "Хайруллин Дмитрий Шамилевич",
+        title: "Специалист Департамента Безопасности **Хайруллин Дмитрий Шамилевич**",
+        link: "https://t.me/m/9CzX_flWZDhi",
+        chat_id: 7698094195
+      },
+      "112437": {
+        fio: "Рымкулов Бахыт Алимжонович",
+        title: "Старший Специалист Департамента Безопасности **Рымкулов Бахыт Алимжонович**",
+        link: "https://t.me/Uz_MB1",
+        chat_id: 7814377002
+      },
+    };
+
+    const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
+
+    purposeSelect.addEventListener("change", () => {
+      const purpose = purposeSelect.value;
+      document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
+      document.getElementById("question-section").style.display = purpose === "specialist" ? "none" : "block";
+    });
+
+    sendBtn.addEventListener("click", async () => {
+      const fio = fioInput.value.trim();
+      const tab = tabnumInput.value.trim();
+      const purpose = purposeSelect.value;
+      const client = tg.initDataUnsafe?.user;
+
+      if (!fio) return showModal("Пожалуйста, введите ФИО заявителя.");
+
+      if (purpose !== "specialist") {
+        showModal("Запрос отправлен, ожидайте ответа.", () => {
+          window.location.href = "https://cbu.uz/ru/";
+        });
+        return;
+      }
+
+      if (!managers[tab]) {
+        showModal("❌ Специалиста с этим номером нет.", () => tabnumInput.focus());
+        return;
+      }
+
+      const manager = managers[tab];
+      const clientName = `${client?.first_name || ""} ${client?.last_name || ""}`.trim();
+      const username = client?.username ? `@${client.username}` : "—";
+
+      const textForManager =
+        `📨 Новая заявка!\n` +
+        `👤 ФИО (из формы): ${fio}\n` +
+        `👤 ФИО (в Telegram): ${clientName}\n` +
+        `🌐 Username: ${username}\n` +
+        `🆔 Chat ID: <code>${client?.id}</code>`;
+
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: manager.chat_id,
+          text: textForManager,
+          parse_mode: "HTML"
+        })
+      });
+
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: client.id,
+          text: manager.title,
+          parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [[{ text: "Перейти в чат", url: manager.link }]]
+          }
+        })
+      });
+
+      showModal("Запрос принят ✔", () => tg.close());
+    });
+
+    function showModal(text, onClose) {
+      modalText.textContent = text;
+      modal.classList.add("active");
+      closeModal.onclick = () => {
+        modal.classList.remove("active");
+        if (onClose) onClose();
+      };
+    }
   </script>
 </body>
 </html>
