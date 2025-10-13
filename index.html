@@ -49,13 +49,13 @@
 
   <script>
     const tg = window.Telegram.WebApp;
-    const fio = document.getElementById("fio");
-    const tabnum = document.getElementById("tabnum");
-    const btn = document.getElementById("nextBtn");
+    const fioInput = document.getElementById("fio");
+    const tabnumInput = document.getElementById("tabnum");
+    const nextBtn = document.getElementById("nextBtn");
 
     const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
 
-    // Табельные номера и данные
+    // Данные специалистов
     const managers = {
       "041483": {
         fio: "Хайруллин Дмитрий Шамилевич",
@@ -120,46 +120,57 @@
     };
 
     function checkInputs() {
-      btn.disabled = !(fio.value.trim() && tabnum.value.trim());
+      nextBtn.disabled = !(fioInput.value.trim() && tabnumInput.value.trim());
     }
-    fio.addEventListener("input", checkInputs);
-    tabnum.addEventListener("input", checkInputs);
+    fioInput.addEventListener("input", checkInputs);
+    tabnumInput.addEventListener("input", checkInputs);
 
-    btn.addEventListener("click", async () => {
-      const clientChatId = tg.initDataUnsafe?.user?.id;
-      const tab = tabnum.value.trim();
+    nextBtn.addEventListener("click", async () => {
+      const client = tg.initDataUnsafe?.user;
+      const tab = tabnumInput.value.trim();
+      const fio = fioInput.value.trim();
 
-      if (!clientChatId) return alert("Ошибка: Telegram WebApp не инициализирован");
+      if (!client?.id) return alert("Ошибка: Telegram WebApp не инициализирован");
       if (!managers[tab]) return alert("Ошибка: табельный номер не найден");
 
       const manager = managers[tab];
 
-      // Отправляем специалисту ФИО заявителя и его chat_id
-      const toManager = `📨 Новая заявка!\n👤 ФИО заявителя: ${fio.value}\n💬 Chat ID: ${clientChatId}`;
+      // 👤 Инфа о клиенте
+      const clientName = `${client.first_name || ""} ${client.last_name || ""}`.trim();
+      const username = client.username ? `@${client.username}` : "—";
 
+      // 📨 Текст менеджеру
+      const textForManager =
+        `📨 Новая заявка!\n` +
+        `👤 ФИО (из формы): ${fio}\n` +
+        `👤 ФИО (в Telegram): ${clientName}\n` +
+        `🌐 Username: ${username}\n` +
+        `🆔 Chat ID: <code>${client.id}</code>\n\n` +
+        `💬 Чтобы скопировать chat_id, просто нажмите на него.`;
+
+      // 1️⃣ Отправляем менеджеру данные клиента
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: manager.chat_id,
-          text: toManager
-        }),
+          text: textForManager,
+          parse_mode: "HTML"
+        })
       });
 
-      // Отправляем клиенту сообщение о специалисте с кнопкой
+      // 2️⃣ Отправляем клиенту карточку специалиста
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chat_id: clientChatId,
+          chat_id: client.id,
           text: manager.title,
           parse_mode: "Markdown",
           reply_markup: {
-            inline_keyboard: [
-              [{ text: "Перейти в чат", url: manager.link }]
-            ]
+            inline_keyboard: [[{ text: "Перейти в чат", url: manager.link }]]
           }
-        }),
+        })
       });
 
       tg.close();
