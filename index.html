@@ -203,7 +203,7 @@
     <div class="modal-content" id="modal-content">
       <p id="modal-text">Запрос отправлен, ожидайте ответа</p>
       <button id="closeModal">Закрыть</button>
-     </div>
+    </div>
   </div>
 
     <footer>
@@ -252,13 +252,11 @@
 
     purposeSelect.addEventListener("change", () => {
       const purpose = purposeSelect.value;
-      // Получение текстового описания цели
-      const purposeText = purposeSelect.options[purposeSelect.selectedIndex].text; 
-
+      
       document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
       document.getElementById("question-section").style.display = purpose === "specialist" ? "none" : "block";
       
-      // Обновление заголовка для секции вопроса/обращения
+      // Обновление заголовка для секции вопроса/обращения (для удобства пользователя)
       document.querySelector('#question-section label').textContent = (purpose === "question" ? "Укажите ваш вопрос" : 
                                                                                 purpose === "support" ? "Опишите проблему" : 
                                                                                 purpose === "proposal" ? "Опишите ваше предложение" : 
@@ -276,12 +274,13 @@
 
       if (!fio) return showModal("Пожалуйста, введите ФИО заявителя.");
 
-      // --- ОБРАБОТКА ОБЩИХ ОБРАЩЕНИЙ ---
+      // --- ОБРАБОТКА ОБЩИХ ОБРАЩЕНИЙ (НОВЫЙ БЛОК) ---
       if (purpose !== "specialist") {
-        const question = questionInput.value.trim() || '—';
+        const question = questionInput.value.trim();
 
+        // Проверка на ввод текста обращения
         if (!question || question.length < 5) {
-          return showModal("Пожалуйста, введите текст вашего обращения (минимум 5 символов).", () => questionInput.focus());
+          return showModal(`Пожалуйста, введите текст вашего обращения по цели "${purposeText}" (минимум 5 символов).`, () => questionInput.focus());
         }
 
         const textForGeneralChat =
@@ -306,6 +305,7 @@
               parse_mode: "Markdown" // Используем Markdown для форматирования
             })
           });
+          // Уведомление об успешной отправке и закрытие
           showModal("Запрос отправлен, ожидайте ответа ✔", () => tg.close());
         } catch (error) {
           console.error("Ошибка при отправке в общий чат:", error);
@@ -314,7 +314,7 @@
         return;
       }
 
-      // --- ОБРАБОТКА "СВЯЗЬ СО СПЕЦИАЛИСТОМ" ---
+      // --- ОБРАБОТКА "СВЯЗЬ СО СПЕЦИАЛИСТОМ" (СУЩЕСТВУЮЩИЙ БЛОК) ---
       if (!managers[tab]) {
         showModal("❌ Специалиста с этим номером нет.", () => tabnumInput.focus());
         return;
