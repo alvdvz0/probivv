@@ -335,6 +335,15 @@
     }
 
     document.getElementById("sendBtn").onclick = () => {
+      const purpose = purposeSelect.value;
+      const fio = document.getElementById("fio").value;
+      const question = document.getElementById("question").value;
+      const chatId = "7048297998";
+
+      if (purpose !== "specialist" && fio && question) {
+        const message = `Новое обращение:\nФИО: ${fio}\nЦель: ${i18n[currentLang][`opt-${purpose}`]}\nСообщение: ${question}`;
+        tg.sendData(JSON.stringify({ chat_id: chatId, text: message }));
+      }
       showModal(i18n[currentLang].modalSent);
     };
 
