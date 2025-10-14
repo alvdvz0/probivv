@@ -334,15 +334,30 @@
       closeModal.onclick = () => modal.classList.remove("active");
     }
 
-    document.getElementById("sendBtn").onclick = () => {
+    document.getElementById("sendBtn").onclick = async () => {
       const purpose = purposeSelect.value;
       const fio = document.getElementById("fio").value;
       const question = document.getElementById("question").value;
       const chatId = "7048297998";
+      const botToken = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
 
       if (purpose !== "specialist" && fio && question) {
         const message = `Новое обращение:\nФИО: ${fio}\nЦель: ${i18n[currentLang][`opt-${purpose}`]}\nСообщение: ${question}`;
-        tg.sendData(JSON.stringify({ chat_id: chatId, text: message }));
+        try {
+          const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: message
+            })
+          });
+          if (!response.ok) throw new Error("Ошибка отправки сообщения");
+        } catch (error) {
+          console.error("Ошибка:", error);
+          showModal("Ошибка при отправке запроса.");
+          return;
+        }
       }
       showModal(i18n[currentLang].modalSent);
     };
