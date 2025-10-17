@@ -1,325 +1,261 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Отправить обращение — Центральный банк РУз</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Обращение в ЦБ РУз</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    html, body {
-      font-family: "Segoe UI", sans-serif;
-      background: url("фон.jpg") no-repeat center center fixed;
-      background-size: cover;
+    body {
       margin: 0;
-      padding: 0;
-      color: #003366;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: url('фон.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
-      user-select: none;
       overscroll-behavior: none;
-      touch-action: manipulation;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
-
-    body * {
-      box-sizing: border-box;
-    }
-
-    img.logo {
+    .logo {
       width: 100%;
-      height: auto;
-      display: block;
-      cursor: pointer;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 12px;
-      padding: 25px;
-      margin-top: 10px;
-      width: 92%;
-      max-width: 420px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       text-align: center;
+      background: #fff;
+      padding: 10px 0;
     }
-
-    h2 {
-      color: #003366;
-      font-size: 22px;
+    .logo img {
+      max-width: 200px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 90%;
+      margin: 20px auto;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+    }
+    h1 {
+      font-size: 20px;
+      color: #003087;
+      text-align: center;
       margin-bottom: 20px;
-      border-bottom: 2px solid #003366;
-      padding-bottom: 8px;
     }
-
+    .form-group {
+      margin-bottom: 15px;
+    }
     label {
       display: block;
-      font-weight: bold;
-      margin-top: 15px;
-      font-size: 15px;
-      text-align: left;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 5px;
     }
-
-    input, select {
+    select, input, textarea {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
+      font-size: 14px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 15px;
-      text-align: center;
-      background-color: #f8f9fa;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
-
-    select:disabled {
-      color: #555;
-      background-color: #e9ecef;
-      appearance: none;
+    select:disabled, input:disabled {
+      background: #e0e0e0;
+      cursor: not-allowed;
     }
-
+    textarea {
+      resize: none;
+      height: 100px;
+    }
     button {
-      margin-top: 25px;
       width: 100%;
-      background-color: #003366;
-      color: white;
-      border: none;
       padding: 12px;
-      border-radius: 8px;
+      background: #003087;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
       font-size: 16px;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #004a99;
+      background: #0040b0;
     }
-
-    /* Модальное окно */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      visibility: hidden;
-      z-index: 100;
-    }
-
-    .modal.active {
-      visibility: visible;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      padding: 25px;
-      text-align: center;
-      width: 90%;
-      max-width: 320px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    .modal-content p {
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-
-    .modal-content button {
-      width: auto;
-      padding: 8px 18px;
-      font-size: 15px;
-    }
-
     footer {
       text-align: center;
-      color: #003366;
-      font-size: 13px;
-      margin: 25px 10px 15px;
-      line-height: 1.5;
+      padding: 20px;
+      font-size: 12px;
+      color: #666;
+      margin-top: auto;
     }
-
     footer a {
-      color: #003366;
+      color: #003087;
       text-decoration: none;
-      font-weight: 600;
     }
-
-    footer a:hover {
-      text-decoration: underline;
+    .notification {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .notification-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .notification-content button {
+      margin-top: 10px;
+      background: #003087;
     }
   </style>
 </head>
-<body oncontextmenu="return false;">
-  <!-- логотип -->
-  <img src="лого.jpg" class="logo" alt="ЦБ РУЗ" onclick="window.location.href='https://cbu.uz/ru/'">
-
-  <!-- форма -->
+<body>
+  <div class="logo">
+    <img src="лого.jpg" alt="ЦБ РУз" onclick="window.location.href='https://cbu.uz/ru/'">
+  </div>
   <div class="container">
-    <h2>Отправить обращение</h2>
-
-    <label>Территориальное подразделение</label>
-    <select disabled>
-      <option>Центральный аппарат ЦБ</option>
-      <option>Ташкентское областное управление</option>
-      <option>Самаркандское областное управление</option>
-    </select>
-
-    <label>Департамент</label>
-    <select disabled>
-      <option>Департамент Безопасности</option>
-      <option>Департамент ИТ</option>
-      <option>Департамент финансового контроля</option>
-    </select>
-
-    <label>ФИО заявителя</label>
-    <input type="text" id="fio" placeholder="Введите ФИО">
-
-    <label>Цель обращения</label>
-    <select id="purpose">
-      <option value="specialist">Связь со специалистом</option>
-      <option value="question">Задать вопрос</option>
-      <option value="support">Обращение в поддержку</option>
-      <option value="proposal">Предложения</option>
-    </select>
-
-    <div id="specialist-section" style="display:block;">
+    <h1>Отправить обращение</h1>
+    <div class="form-group">
+      <label>Территориальное подразделение</label>
+      <select disabled>
+        <option>Центральный аппарат ЦБ</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Департамент</label>
+      <select disabled>
+        <option>Департамент безопасности</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>ФИО заявителя</label>
+      <input type="text" id="fio" placeholder="Введите ФИО">
+    </div>
+    <div class="form-group">
+      <label>Цель обращения</label>
+      <select id="purpose" onchange="togglePurposeField()">
+        <option value="Связь со специалистом">Связь со специалистом</option>
+        <option value="Задать вопрос">Задать вопрос</option>
+        <option value="Предложения">Предложения</option>
+        <option value="Обращение в поддержку">Обращение в поддержку</option>
+      </select>
+    </div>
+    <div class="form-group" id="specialist-field" style="display: none;">
       <label>Табельный номер специалиста</label>
-      <input type="text" id="tabnum" placeholder="Например: 041483">
+      <input type="text" id="specialist-number" placeholder="Введите номер">
     </div>
-
-    <div id="question-section" style="display:none;">
-      <label>Укажите ваш вопрос</label>
-      <input type="text" id="question" placeholder="Введите ваш вопрос">
+    <div class="form-group" id="question-field" style="display: none;">
+      <label>Укажите вопрос</label>
+      <textarea id="question" placeholder="Введите ваш вопрос или предложение"></textarea>
     </div>
-
-    <button id="sendBtn">Отправить запрос</button>
+    <button onclick="submitRequest()">Отправить запрос</button>
   </div>
-
-  <!-- модальное окно -->
-  <div class="modal" id="modal">
-    <div class="modal-content" id="modal-content">
-      <p id="modal-text">Запрос отправлен, ожидайте ответа</p>
-      <button id="closeModal">Закрыть</button>
-    </div>
-  </div>
-
-  <!-- футер -->
   <footer>
     © 2005–2025<br>
     Центральный банк Республики Узбекистан, официальный сайт.<br>
     Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
   </footer>
+  <div class="notification" id="notification">
+    <div class="notification-content">
+      <p>Спасибо за обращение</p>
+      <button onclick="closeWebApp()">Вернуться в бот</button>
+    </div>
+  </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    const fioInput = document.getElementById('fio');
-    const tabnumInput = document.getElementById('tabnum');
-    const purposeSelect = document.getElementById('purpose');
-    const sendBtn = document.getElementById('sendBtn');
-    const modal = document.getElementById('modal');
-    const modalText = document.getElementById('modal-text');
-    const closeModal = document.getElementById('closeModal');
+    // Проверка, что страница открыта как Telegram Web App
+    if (!window.Telegram || !window.Telegram.WebApp) {
+      document.body.innerHTML = '<h1>Ошибка: Доступ возможен только через Telegram</h1>';
+      throw new Error('This page can only be accessed as a Telegram Web App');
+    }
 
-    // запрет масштабирования
-    document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
-    document.addEventListener('gesturestart', e => e.preventDefault());
-    document.addEventListener('gesturechange', e => e.preventDefault());
-    document.addEventListener('gestureend', e => e.preventDefault());
+    // Инициализация Telegram Web App
+    window.Telegram.WebApp.ready();
 
-    // список специалистов
-    const managers = {
-      "041483": {
-        fio: "Хайруллин Дмитрий Шамилевич",
-        title: "Специалист Департамента Безопасности **Хайруллин Дмитрий Шамилевич**",
-        link: "https://t.me/m/9CzX_flWZDhi",
-        chat_id: 7698094195
-      },
-      "112437": {
-        fio: "Рымкулов Бахыт Алимжонович",
-        title: "Старший Специалист Департамента Безопасности **Рымкулов Бахыт Алимжонович**",
-        link: "https://t.me/Uz_MB1",
-        chat_id: 7814377002
-      },
-    };
+    function togglePurposeField() {
+      const purpose = document.getElementById('purpose').value;
+      const specialistField = document.getElementById('specialist-field');
+      const questionField = document.getElementById('question-field');
+      if (purpose === 'Связь со специалистом') {
+        specialistField.style.display = 'block';
+        questionField.style.display = 'none';
+      } else {
+        specialistField.style.display = 'none';
+        questionField.style.display = 'block';
+      }
+    }
 
-    const token = "7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4";
+    async function submitRequest() {
+      const fio = document.getElementById('fio').value;
+      const purpose = document.getElementById('purpose').value;
+      const specialistNumber = document.getElementById('specialist-number').value;
+      const question = document.getElementById('question').value;
+      const botToken = '7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4';
+      const defaultChatId = '7048297998';
 
-    purposeSelect.addEventListener("change", () => {
-      const purpose = purposeSelect.value;
-      document.getElementById("specialist-section").style.display = purpose === "specialist" ? "block" : "none";
-      document.getElementById("question-section").style.display = purpose === "specialist" ? "none" : "block";
-    });
+      // Получение данных пользователя из Telegram
+      const user = window.Telegram.WebApp.initDataUnsafe.user || {};
+      const chatId = user.id || '';
+      const username = user.username || 'Не указано';
+      const userLink = user.username ? `t.me/${user.username}` : 'Не указано';
 
-    sendBtn.addEventListener("click", async () => {
-      const fio = fioInput.value.trim();
-      const tab = tabnumInput.value.trim();
-      const purpose = purposeSelect.value;
-      const client = tg.initDataUnsafe?.user;
+      let message = `Новое обращение:\nФИО: ${fio}\nЦель: ${purpose}\n`;
+      let targetChatId = defaultChatId;
+      let responseMessage = 'Ваше обращение обрабатывается, ожидайте ответа в ближайшее время.';
 
-      if (!fio) return showModal("Пожалуйста, введите ФИО заявителя.");
+      if (purpose === 'Связь со специалистом' && specialistNumber) {
+        message += `Табельный номер: ${specialistNumber}\n`;
+        if (specialistNumber === '041483') {
+          targetChatId = '7698094195';
+          responseMessage = 'Специалист Департамента Безопасности Хайруллин Дмитрий Шамилевич';
+          window.Telegram.WebApp.sendData(JSON.stringify({
+            responseMessage,
+            inlineButton: { text: 'Перейти в чат', url: 't.me/Markaziy_banki123' }
+          }));
+        } else if (specialistNumber === '112437') {
+          targetChatId = '938263475';
+          responseMessage = 'Специалист Департамента Безопасности Рымкулов Бахыт Алимжанович';
+          window.Telegram.WebApp.sendData(JSON.stringify({
+            responseMessage,
+            inlineButton: { text: 'Перейти в чат', url: 't.me/Afferist132' }
+          }));
+        }
+      } else {
+        message += `Вопрос/Предложение: ${question}\n`;
+      }
 
-      if (purpose !== "specialist") {
-        showModal("Запрос отправлен, ожидайте ответа.", () => {
-          window.location.href = "https://cbu.uz/ru/";
+      message += `Chat ID: ${chatId}\nСсылка: ${userLink}\nИмя аккаунта: ${username}`;
+
+      // Отправка сообщения в Telegram
+      try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: targetChatId,
+            text: message
+          })
         });
-        return;
+
+        // Показ уведомления
+        document.getElementById('notification').style.display = 'flex';
+      } catch (error) {
+        console.error('Ошибка отправки:', error);
+        alert('Ошибка при отправке обращения');
       }
+    }
 
-      if (!managers[tab]) {
-        showModal("❌ Специалиста с этим номером нет.", () => tabnumInput.focus());
-        return;
-      }
-
-      const manager = managers[tab];
-      const clientName = `${client?.first_name || ""} ${client?.last_name || ""}`.trim();
-      const username = client?.username ? `@${client.username}` : "—";
-
-      const textForManager =
-        `📨 Новая заявка!\n` +
-        `👤 ФИО (из формы): ${fio}\n` +
-        `👤 ФИО (в Telegram): ${clientName}\n` +
-        `🌐 Username: ${username}\n` +
-        `🆔 Chat ID: <code>${client?.id}</code>`;
-
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: manager.chat_id,
-          text: textForManager,
-          parse_mode: "HTML"
-        })
-      });
-
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: client.id,
-          text: manager.title,
-          parse_mode: "Markdown",
-          reply_markup: {
-            inline_keyboard: [[{ text: "Перейти в чат", url: manager.link }]]
-          }
-        })
-      });
-
-      showModal("Запрос принят ✔", () => tg.close());
-    });
-
-    function showModal(text, onClose) {
-      modalText.textContent = text;
-      modal.classList.add("active");
-      closeModal.onclick = () => {
-        modal.classList.remove("active");
-        if (onClose) onClose();
-      };
+    function closeWebApp() {
+      window.Telegram.WebApp.close();
     }
   </script>
 </body>
