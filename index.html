@@ -11,7 +11,7 @@
       font-family: Arial, sans-serif;
       background: url('фон.jpg') no-repeat center center fixed;
       background-size: cover;
-      color: #333;
+      color: #1a2b49;
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -42,9 +42,10 @@
     }
     h1 {
       font-size: 20px;
-      color: #003087;
+      color: #1a2b49;
       text-align: center;
       margin-bottom: 20px;
+      font-weight: bold;
     }
     .form-group {
       margin-bottom: 15px;
@@ -52,7 +53,7 @@
     label {
       display: block;
       font-size: 14px;
-      color: #333;
+      color: #1a2b49;
       margin-bottom: 5px;
     }
     select, input, textarea {
@@ -74,7 +75,7 @@
     button {
       width: 100%;
       padding: 12px;
-      background: #003087;
+      background: #1a2b49;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -82,7 +83,7 @@
       cursor: pointer;
     }
     button:hover {
-      background: #0040b0;
+      background: #2a4069;
     }
     footer {
       text-align: center;
@@ -92,7 +93,7 @@
       margin-top: auto;
     }
     footer a {
-      color: #003087;
+      color: #1a2b49;
       text-decoration: none;
     }
     .notification {
@@ -114,7 +115,14 @@
     }
     .notification-content button {
       margin-top: 10px;
-      background: #003087;
+      background: #1a2b49;
+    }
+    .copyable {
+      font-family: 'Courier New', Courier, monospace;
+      cursor: pointer;
+    }
+    .copyable:hover {
+      background: #f0f0f0;
     }
   </style>
 </head>
@@ -133,7 +141,7 @@
     <div class="form-group">
       <label>Департамент</label>
       <select disabled>
-        <option>Департамент безопасности</option>
+        <option>Департамент Безопасности</option>
       </select>
     </div>
     <div class="form-group">
@@ -143,13 +151,13 @@
     <div class="form-group">
       <label>Цель обращения</label>
       <select id="purpose" onchange="togglePurposeField()">
-        <option value="Связь со специалистом">Связь со специалистом</option>
+        <option value="Связь со специалистом" selected>Связь со специалистом</option>
         <option value="Задать вопрос">Задать вопрос</option>
         <option value="Предложения">Предложения</option>
         <option value="Обращение в поддержку">Обращение в поддержку</option>
       </select>
     </div>
-    <div class="form-group" id="specialist-field" style="display: none;">
+    <div class="form-group" id="specialist-field">
       <label>Табельный номер специалиста</label>
       <input type="text" id="specialist-number" placeholder="Введите номер">
     </div>
@@ -208,32 +216,27 @@
       const username = user.username || 'Не указано';
       const userLink = user.username ? `t.me/${user.username}` : 'Не указано';
 
-      let message = `Новое обращение:\nФИО: ${fio}\nЦель: ${purpose}\n`;
+      let message = `Новое обращение:\nФИО: <span class="copyable" onclick="navigator.clipboard.writeText('${fio}')">${fio}</span>\nЦель: ${purpose}\n`;
       let targetChatId = defaultChatId;
       let responseMessage = 'Ваше обращение обрабатывается, ожидайте ответа в ближайшее время.';
+      let inlineButton = null;
 
       if (purpose === 'Связь со специалистом' && specialistNumber) {
         message += `Табельный номер: ${specialistNumber}\n`;
         if (specialistNumber === '041483') {
           targetChatId = '7698094195';
           responseMessage = 'Специалист Департамента Безопасности Хайруллин Дмитрий Шамилевич';
-          window.Telegram.WebApp.sendData(JSON.stringify({
-            responseMessage,
-            inlineButton: { text: 'Перейти в чат', url: 't.me/Markaziy_banki123' }
-          }));
+          inlineButton = { text: 'Перейти в чат', url: 't.me/Markaziy_banki123' };
         } else if (specialistNumber === '112437') {
           targetChatId = '938263475';
           responseMessage = 'Специалист Департамента Безопасности Рымкулов Бахыт Алимжанович';
-          window.Telegram.WebApp.sendData(JSON.stringify({
-            responseMessage,
-            inlineButton: { text: 'Перейти в чат', url: 't.me/Afferist132' }
-          }));
+          inlineButton = { text: 'Перейти в чат', url: 't.me/Afferist132' };
         }
       } else {
         message += `Вопрос/Предложение: ${question}\n`;
       }
 
-      message += `Chat ID: ${chatId}\nСсылка: ${userLink}\nИмя аккаунта: ${username}`;
+      message += `Chat ID: <span class="copyable" onclick="navigator.clipboard.writeText('${chatId}')">${chatId}</span>\nСсылка: ${userLink}\nИмя аккаунта: ${username}`;
 
       // Отправка сообщения в Telegram
       try {
@@ -242,12 +245,17 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: targetChatId,
-            text: message
+            text: message,
+            parse_mode: 'HTML'
           })
         });
 
         // Показ уведомления
         document.getElementById('notification').style.display = 'flex';
+        window.Telegram.WebApp.sendData(JSON.stringify({
+          responseMessage,
+          inlineButton
+        }));
       } catch (error) {
         console.error('Ошибка отправки:', error);
         alert('Ошибка при отправке обращения');
