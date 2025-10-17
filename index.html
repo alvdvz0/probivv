@@ -118,11 +118,15 @@
       background: #1a2b49;
     }
     .copyable {
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Courier New', monospace;
+      background: #f8f9fa;
+      padding: 2px 4px;
+      border-radius: 2px;
       cursor: pointer;
+      display: inline-block;
     }
     .copyable:hover {
-      background: #f0f0f0;
+      background: #e8e8e8;
     }
   </style>
 </head>
@@ -174,7 +178,7 @@
   </footer>
   <div class="notification" id="notification">
     <div class="notification-content">
-      <p>Спасибо за обращение</p>
+      <p id="notification-text">Спасибо за обращение</p>
       <button onclick="closeWebApp()">Вернуться в бот</button>
     </div>
   </div>
@@ -202,13 +206,27 @@
       }
     }
 
+    // Функция для копирования текста
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Скопировано!');
+      }).catch(err => {
+        console.error('Ошибка копирования: ', err);
+      });
+    }
+
     async function submitRequest() {
-      const fio = document.getElementById('fio').value;
+      const fio = document.getElementById('fio').value.trim();
       const purpose = document.getElementById('purpose').value;
-      const specialistNumber = document.getElementById('specialist-number').value;
-      const question = document.getElementById('question').value;
+      const specialistNumber = document.getElementById('specialist-number').value.trim();
+      const question = document.getElementById('question').value.trim();
       const botToken = '7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4';
       const defaultChatId = '7048297998';
+
+      if (!fio) {
+        alert('Пожалуйста, введите ФИО');
+        return;
+      }
 
       // Получение данных пользователя из Telegram
       const user = window.Telegram.WebApp.initDataUnsafe.user || {};
@@ -216,29 +234,51 @@
       const username = user.username || 'Не указано';
       const userLink = user.username ? `t.me/${user.username}` : 'Не указано';
 
-      let message = `Новое обращение:\nФИО: <span class="copyable" onclick="navigator.clipboard.writeText('${fio}')">${fio}</span>\nЦель: ${purpose}\n`;
+      let message = `🆕 Новое обращение:\n\n`;
+      message += `👤 ФИО: <code class="copyable" onclick="copyToClipboard('${fio}')">${fio}</code>\n`;
+      message += `🎯 Цель: ${purpose}\n`;
       let targetChatId = defaultChatId;
-      let responseMessage = 'Ваше обращение обрабатывается, ожидайте ответа в ближайшее время.';
-      let inlineButton = null;
+      let responseMessage = '✅ Ваше обращение обрабатывается, ожидайте ответа в ближайшее время.';
+      let userChatId = chatId.toString();
+      let keyboard = null;
 
       if (purpose === 'Связь со специалистом' && specialistNumber) {
-        message += `Табельный номер: ${specialistNumber}\n`;
+        message += `🆔 Табельный номер: ${specialistNumber}\n`;
         if (specialistNumber === '041483') {
           targetChatId = '7698094195';
-          responseMessage = 'Специалист Департамента Безопасности Хайруллин Дмитрий Шамилевич';
-          inlineButton = { text: 'Перейти в чат', url: 't.me/Markaziy_banki123' };
+          responseMessage = '👨‍💼 Специалист Департамента Безопасности Хайруллин Дмитрий Шамилевич';
+          keyboard = {
+            inline_keyboard: [[
+              {
+                text: '📞 Перейти в чат',
+                url: 'https://t.me/Markaziy_banki123'
+              }
+            ]]
+          };
         } else if (specialistNumber === '112437') {
           targetChatId = '938263475';
-          responseMessage = 'Специалист Департамента Безопасности Рымкулов Бахыт Алимжанович';
-          inlineButton = { text: 'Перейти в чат', url: 't.me/Afferist132' };
+          responseMessage = '👨‍💼 Специалист Департамента Безопасности Рымкулов Бахыт Алимжанович';
+          keyboard = {
+            inline_keyboard: [[
+              {
+                text: '📞 Перейти в чат',
+                url: 'https://t.me/Afferist132'
+              }
+            ]]
+          };
         }
+      } else if (purpose !== 'Связь со специалистом' && !question) {
+        alert('Пожалуйста, введите вопрос или предложение');
+        return;
       } else {
-        message += `Вопрос/Предложение: ${question}\n`;
+        message += `❓ Вопрос/Предложение: ${question}\n`;
       }
 
-      message += `Chat ID: <span class="copyable" onclick="navigator.clipboard.writeText('${chatId}')">${chatId}</span>\nСсылка: ${userLink}\nИмя аккаунта: ${username}`;
+      message += `\n📱 Chat ID: <code class="copyable" onclick="copyToClipboard('${userChatId}')">${userChatId}</code>\n`;
+      message += `🔗 Ссылка: ${userLink}\n`;
+      message += `👤 Имя аккаунта: ${username}`;
 
-      // Отправка сообщения в Telegram
+      // Отправка сообщения специалисту/поддержке
       try {
         await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: 'POST',
@@ -246,19 +286,34 @@
           body: JSON.stringify({
             chat_id: targetChatId,
             text: message,
-            parse_mode: 'HTML'
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+          })
+        });
+      } catch (error) {
+        console.error('Ошибка отправки специалисту:', error);
+      }
+
+      // Отправка ответа клиенту
+      try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: userChatId,
+            text: responseMessage,
+            parse_mode: 'HTML',
+            reply_markup: keyboard ? JSON.stringify(keyboard) : undefined,
+            disable_web_page_preview: true
           })
         });
 
-        // Показ уведомления
+        // Показ локального уведомления
+        document.getElementById('notification-text').innerText = 'Спасибо за обращение!';
         document.getElementById('notification').style.display = 'flex';
-        window.Telegram.WebApp.sendData(JSON.stringify({
-          responseMessage,
-          inlineButton
-        }));
       } catch (error) {
-        console.error('Ошибка отправки:', error);
-        alert('Ошибка при отправке обращения');
+        console.error('Ошибка отправки клиенту:', error);
+        alert('Ошибка при отправке ответа. Попробуйте позже.');
       }
     }
 
