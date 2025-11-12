@@ -25,13 +25,12 @@
       background: #fff;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       z-index: 997;
-      position: relative;
+      cursor: pointer;
     }
     .logo img {
       width: 100%;
       height: auto;
       display: block;
-      cursor: pointer;
     }
     .container {
       max-width: 90%;
@@ -94,7 +93,7 @@
       text-decoration: none;
     }
 
-    /* Кнопка внизу — всегда доступна */
+    /* Кнопка внизу */
     .bottom-tg-button {
       position: fixed;
       bottom: 0;
@@ -115,14 +114,13 @@
       background: #006fa3;
     }
 
-    /* Уведомление — адаптивное, перенос строк */
+    /* Уведомление */
     .notification {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
       max-width: 94%;
-      width: auto;
       background: #dc3545;
       color: white;
       padding: 16px 20px;
@@ -143,7 +141,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Модальное окно — логотип остаётся сверху */
+    /* Модальное окно */
     .modal {
       display: none;
       position: fixed;
@@ -178,12 +176,12 @@
     }
     .close:hover { color: #000; }
     .info {
-      line-height: 2.1;
+      line-height: 2;
       font-size: 16px;
     }
     .status {
-      margin-top: 22px;
-      padding: 16px;
+      margin-top: 12px; /* Уменьшен отступ — плотнее к данным */
+      padding: 14px;
       border-radius: 10px;
       text-align: center;
       font-weight: bold;
@@ -203,8 +201,9 @@
 </head>
 <body>
 
-  <div class="logo">
-    <img src="лого.jpg" alt="ЦБ РУз" onclick="window.location.href='https://cbu.uz/ru/'">
+  <!-- Кликабельный логотип -->
+  <div class="logo" onclick="window.location.href='https://cbu.uz/ru/'">
+    <img src="лого.jpg" alt="ЦБ РУз">
   </div>
 
   <div class="container">
@@ -224,7 +223,7 @@
     Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
   </footer>
 
-  <!-- Кнопка "Вернуться в Telegram" — только внизу экрана -->
+  <!-- Кнопка "Вернуться в Telegram" -->
   <button class="bottom-tg-button" onclick="closeWebApp()">Вернуться в Telegram</button>
 
   <!-- Уведомление -->
@@ -232,15 +231,16 @@
     Данный специалист не является сотрудником, или проверьте правильность написания
   </div>
 
-  <!-- Модальное окно — БЕЗ кнопки возврата -->
+  <!-- Модальное окно -->
   <div class="modal" id="resultModal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">×</span>
+      <span class="close" onclick="closeModal()">x</span>
       <div class="info" id="employeeInfo"></div>
     </div>
   </div>
 
   <script>
+    // Инициализация Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
     }
@@ -341,7 +341,7 @@
         Должность: ${found.position}<br>
         Департамент: ${found.dept}<br>
         Стаж: ${found.expTotal}<br>
-        Стаж на данной должности: ${found.expPos}<br><br>
+        Стаж на данной должности: ${found.expPos}<br>
         <div class="status ${statusClass}">${statusText}</div>
       `;
 
@@ -356,14 +356,22 @@
       if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.close();
       } else {
+        // Надёжное закрытие в браузере
+        window.open('', '_self').close();
         window.close();
+        // Если не сработает — покажем сообщение
+        setTimeout(() => {
+          alert('Закройте вкладку вручную');
+        }, 100);
       }
     }
 
+    // Закрытие по клику вне модалки
     window.onclick = e => {
       if (e.target === document.getElementById('resultModal')) closeModal();
     };
 
+    // Enter в поле поиска
     document.getElementById('search').addEventListener('keypress', e => {
       if (e.key === 'Enter') performSearch();
     });
