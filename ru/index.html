@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Проверка специалиста ЦБ РУз</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('фон.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #1a2b49;
+      user-select: none;
+      overscroll-behavior: none;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 70px;
+      box-sizing: border-box;
+    }
+    .logo {
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 997;
+      display: block;
+    }
+    .logo img {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+    }
+    .container {
+      max-width: 90%;
+      margin: 30px auto;
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+      border: 1px solid #e0e0e0;
+      flex: 1;
+    }
+    h1 {
+      font-size: 22px;
+      color: #1a2b49;
+      text-align: center;
+      margin: 0 0 12px 0;
+      font-weight: bold;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .search-group {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #1a2b49;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #2a4069;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #666;
+      margin-top: auto;
+    }
+    footer a {
+      color: #1a2b49;
+      text-decoration: none;
+    }
+
+    .bottom-tg-button {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px;
+      background: #0088cc;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      text-align: center;
+      border: none;
+      z-index: 998;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    .bottom-tg-button:hover {
+      background: #006fa3;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 94%;
+      background: #dc3545;
+      color: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.5;
+      z-index: 9999;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      opacity: 0;
+      transition: all 0.4s ease;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+    .notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.78);
+      justify-content: center;
+      align-items: center;
+      z-index: 996;
+      padding-top: 100px;
+      box-sizing: border-box;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 28px;
+      border-radius: 12px;
+      max-width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      font-size: 36px;
+      cursor: pointer;
+      color: #999;
+      font-weight: bold;
+      z-index: 10;
+    }
+    .close:hover { color: #000; }
+    .info {
+      line-height: 2;
+      font-size: 16px;
+    }
+    .status {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .status.working {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.off {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Кликабельный логотип по всей площади -->
+  <a href="https://cbu.uz/ru/" target="_blank" class="logo">
+    <img src="лого.jpg" alt="ЦБ РУз">
+  </a>
+
+  <div class="container">
+    <h1>Проверка специалиста</h1>
+    <div class="subtitle">Введите данные специалиста</div>
+
+    <div class="search-group">
+      <input type="text" id="search" placeholder="ФИО или номер удостоверения" autocomplete="off">
+    </div>
+
+    <button onclick="performSearch()">Найти специалиста</button>
+  </div>
+
+  <footer>
+    © 2005–2025<br>
+    Центральный банк Республики Узбекистан, официальный сайт.<br>
+    Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
+  </footer>
+
+  <!-- Кнопка "Вернуться в Telegram" -->
+  <button class="bottom-tg-button" onclick="closeWebApp()">Вернуться в Telegram</button>
+
+  <!-- Уведомление -->
+  <div class="notification" id="notif">
+    Данный специалист не является сотрудником, или проверьте правильность написания
+  </div>
+
+  <!-- Модальное окно -->
+  <div class="modal" id="resultModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">x</span>
+      <div class="info" id="employeeInfo"></div>
+    </div>
+  </div>
+
+  <script>
+    // Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+    }
+
+    let employees = [];
+
+    fetch('man.txt')
+      .then(r => r.text())
+      .then(text => {
+        employees = text.trim().split('\n').map(line => {
+          const [id, name, position, dept, expTotal, expPos] = line.split('|');
+          const parts = name.trim().split(' ');
+          return {
+            id: id.trim(),
+            fullName: name.trim(),
+            lastName: parts[0],
+            firstName: parts[1] || '',
+            middleName: parts[2] || '',
+            position: position.trim(),
+            dept: dept.trim(),
+            expTotal: expTotal.trim(),
+            expPos: expPos.trim()
+          };
+        });
+      })
+      .catch(() => showNotification('Ошибка загрузки данных'));
+
+    function formatId(id) {
+      return '№' + id.slice(0,2) + '-' + id.slice(2,4) + '-' + id.slice(4,6);
+    }
+
+    function isWorkingNow() {
+      const now = new Date();
+      const day = now.getDay();
+      const time = now.getHours() * 60 + now.getMinutes();
+      if (day === 0) return false;
+      if (day === 6) return time >= 420 && time < 960;
+      return time >= 420 && time < 1200;
+    }
+
+    function showNotification(text = 'Данный специалист не является сотрудником, или проверьте правильность написания') {
+      const notif = document.getElementById('notif');
+      notif.textContent = text;
+      notif.classList.add('show');
+      setTimeout(() => notif.classList.remove('show'), 5000);
+    }
+
+    function performSearch() {
+      const query = document.getElementById('search').value.trim();
+      if (!query) {
+        showNotification('Введите данные специалиста');
+        return;
+      }
+
+      const cleanQuery = query.replace(/-/g, '');
+      let found = null;
+
+      if (/^\d{6}$/.test(cleanQuery)) {
+        found = employees.find(e => e.id === cleanQuery);
+      } else {
+        const words = query.trim().split(/\s+/);
+        if (words.length < 2) {
+          showNotification('Введите фамилию и имя (или хотя бы 3 буквы имени)');
+          return;
+        }
+
+        const lastName = words[0];
+        const namePart = words.slice(1).join(' ');
+
+        found = employees.find(e => {
+          const ln = e.lastName.toLowerCase();
+          const fn = e.firstName.toLowerCase();
+
+          if (e.fullName.toLowerCase().includes(query.toLowerCase())) return true;
+          if (ln === lastName.toLowerCase() && fn === namePart.toLowerCase()) return true;
+          if (ln === lastName.toLowerCase() && fn.startsWith(namePart.toLowerCase()) && namePart.length >= 3) return true;
+
+          return false;
+        });
+      }
+
+      if (!found) {
+        showNotification();
+        return;
+      }
+
+      const working = isWorkingNow();
+      const statusText = working
+        ? 'В данный момент специалист находится на рабочем месте'
+        : 'В данный момент специалист отсутствует на рабочем месте';
+
+      const statusClass = working ? 'working' : 'off';
+
+      document.getElementById('employeeInfo').innerHTML = `
+        <strong>Информация о сотруднике</strong><br><br>
+        Имя: ${found.fullName}<br>
+        Номер записи: ${formatId(found.id)}<br>
+        Должность: ${found.position}<br>
+        Департамент: ${found.dept}<br>
+        Стаж: ${found.expTotal}<br>
+        Стаж на данной должности: ${found.expPos}<br>
+        <div class="status ${statusClass}">${statusText}</div>
+      `;
+
+      document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('resultModal').style.display = 'none';
+    }
+
+    // УМНАЯ КНОПКА "Вернуться в Telegram"
+    function closeWebApp() {
+      const isTelegram = window.Telegram && window.Telegram.WebApp;
+
+      if (isTelegram) {
+        // Это Mini App — закрываем
+        window.Telegram.WebApp.close();
+      }
+
+      // Через 500 мс — если не закрылось (браузер), переходим в бот
+      setTimeout(() => {
+        if (!isTelegram || document.visibilityState !== 'hidden') {
+          window.location.href = 'https://t.me/MarkaziybankiOZbot';
+        }
+      }, 500);
+    }
+
+    window.onclick = e => {
+      if (e.target === document.getElementById('resultModal')) closeModal();
+    };
+
+    document.getElementById('search').addEventListener('keypress', e => {
+      if (e.key === 'Enter') performSearch();
+    });
+  </script>
+</body>
+</html>
