@@ -1,10 +1,10 @@
-041483|Хайруллин Дмитрий Шамилевич|Менеджер по работе с физическими лицами|Департамент Безопасности|5 лет, 4 месяца|1 год, 2 месяца|
-112437|Рымкулов Бахыт Алимжонович|Менеджер по работе с физическими лицами|Департамент Безопасности|6 лет, 7 месяцев|1 год, 5 месяцев|
-032749|Ахмедов Дмитрий Шамилевич|Менеджер по работе с физическими лицами|Департамент Безопасности|9 лет, 4 месяца|3 года, 2 месяца|
-175317|Круглов Дмитрий Витальевич|Менеджер по работе с физическими лицами|Департамент Безопасности|6 лет, 4 месяца|1 год, 2 месяца|
-180420|Асланова Лина Жекеновна|Менеджер по работе с физическими лицами|Департамент Безопасности|3 года, 3 месяца|1 год, 3 месяца|
-170890|Алиев Тимур Рустамович|Менеджер по работе с физическими лицами|Департамент Безопасности|9 лет, 4 месяцев|2 года, 2 месяца|
-130500|Каримова Муслима Тимуровна|Менеджер по работе с физическими лицами|Департамент Безопасности|3 года, 4 месяца|10 месяцев|
-001377|Ниязов Мансур Санатович|Менеджер по работе с физическими лицами|Департамент Безопасности|3 года, 4 месяца|10 месяцев|
-047083|Турдиев Азиз Анварович|Менеджер по работе с физическими лицами|Департамент Безопасности|3 года, 4 месяца|10 месяцев|
-002352|Каримов Отабек Азизович|Менеджер по работе с физическими лицами|Департамент Безопасности|3 года, 4 месяца|10 месяцев|
+041483|Xairullin Dmitriy Shamilovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|5 yil, 4 oy|1 yil, 2 oy|
+112437|Rımqulov Baxıt Alimjonovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|6 yil, 7 oy|1 yil, 5 oy|
+032749|Axmedov Dmitriy Shamilovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|9 yil, 4 oy|3 yil, 2 oy|
+175317|Kruglov Dmitriy Vitalyevich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|6 yil, 4 oy|1 yil, 2 oy|
+180420|Aslanova Lina Jekenovna|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|3 yil, 3 oy|1 yil, 3 oy|
+170890|Aliyev Timur Rustamovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|9 yil, 4 oy|2 yil, 2 oy|
+130500|Karimova Muslima Timurovna|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
+001377|Niyozov Mansur Sanatovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
+047083|Turdiyev Aziz Anvarovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
+002352|Karimov Otabek Azizovich|Jismoniy shaxslar bilan ishlash bo‘yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
