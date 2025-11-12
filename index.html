@@ -20,17 +20,20 @@
       padding-bottom: 70px;
       box-sizing: border-box;
     }
+    /* Логотип — кликабельный по всей площади */
     .logo {
       width: 100%;
       background: #fff;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       z-index: 997;
       cursor: pointer;
+      display: block;
     }
     .logo img {
       width: 100%;
       height: auto;
       display: block;
+      pointer-events: none; /* чтобы клик проходил сквозь картинку */
     }
     .container {
       max-width: 90%;
@@ -180,7 +183,7 @@
       font-size: 16px;
     }
     .status {
-      margin-top: 12px; /* Уменьшен отступ — плотнее к данным */
+      margin-top: 12px;
       padding: 14px;
       border-radius: 10px;
       text-align: center;
@@ -201,10 +204,10 @@
 </head>
 <body>
 
-  <!-- Кликабельный логотип -->
-  <div class="logo" onclick="window.location.href='https://cbu.uz/ru/'">
+  <!-- Кликабельный логотип по всей площади -->
+  <a href="https://cbu.uz/ru/" target="_blank" class="logo">
     <img src="лого.jpg" alt="ЦБ РУз">
-  </div>
+  </a>
 
   <div class="container">
     <h1>Проверка специалиста</h1>
@@ -234,13 +237,13 @@
   <!-- Модальное окно -->
   <div class="modal" id="resultModal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">x</span>
+      <span class="close" onclick="closeModal()">×</span>
       <div class="info" id="employeeInfo"></div>
     </div>
   </div>
 
   <script>
-    // Инициализация Telegram WebApp
+    // Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
     }
@@ -356,22 +359,22 @@
       if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.close();
       } else {
-        // Надёжное закрытие в браузере
-        window.open('', '_self').close();
-        window.close();
-        // Если не сработает — покажем сообщение
-        setTimeout(() => {
-          alert('Закройте вкладку вручную');
-        }, 100);
+        // Надёжное закрытие вкладки в браузере
+        try {
+          window.close();
+          // Если не закрылось — откроем пустую и закроем
+          const win = window.open('', '_self');
+          if (win) win.close();
+        } catch (e) {}
+        // Если всё ещё открыто — покажем кнопку
+        document.body.innerHTML = '<div style="padding:20px;text-align:center;font-family:Arial;"><h2>Закройте эту вкладку вручную</h2></div>';
       }
     }
 
-    // Закрытие по клику вне модалки
     window.onclick = e => {
       if (e.target === document.getElementById('resultModal')) closeModal();
     };
 
-    // Enter в поле поиска
     document.getElementById('search').addEventListener('keypress', e => {
       if (e.key === 'Enter') performSearch();
     });
