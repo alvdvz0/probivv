@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uz">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Проверка специалиста ЦБ РУз</title>
+  <title>Mutaxassisni tekshirish — Markaziy bank</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -199,46 +199,41 @@
 </head>
 <body>
 
-  <!-- Кликабельный логотип по всей площади -->
-  <a href="https://cbu.uz/ru/" target="_blank" class="logo">
-    <img src="лого.jpg" alt="ЦБ РУз">
+  <a href="https://cbu.uz/uz/" target="_blank" class="logo">
+    <img src="лого.jpg" alt="O‘zbekiston Respublikasi Markaziy banki">
   </a>
 
   <div class="container">
-    <h1>Проверка специалиста</h1>
-    <div class="subtitle">Введите данные специалиста</div>
+    <h1>Mutaxassisni tekshirish</h1>
+    <div class="subtitle">Mutaxassis ma'lumotlarini kiriting</div>
 
     <div class="search-group">
-      <input type="text" id="search" placeholder="ФИО или номер удостоверения" autocomplete="off">
+      <input type="text" id="search" placeholder="FISH yoki guvohnoma raqami" autocomplete="off">
     </div>
 
-    <button onclick="performSearch()">Найти специалиста</button>
+    <button onclick="performSearch()">Mutaxassisni qidirish</button>
   </div>
 
   <footer>
     © 2005–2025<br>
-    Центральный банк Республики Узбекистан, официальный сайт.<br>
-    Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
+    O‘zbekiston Respublikasi Markaziy banki rasmiy sayti.<br>
+    Sayt dizayni va ishlab chiqaruvchisi <a href="https://pixelcraft.uz/">Pixelcraft</a>
   </footer>
 
-  <!-- Кнопка "Вернуться в Telegram" -->
-  <button class="bottom-tg-button" onclick="closeWebApp()">Вернуться в Telegram</button>
+  <button class="bottom-tg-button" onclick="closeWebApp()">Telegramga qaytish</button>
 
-  <!-- Уведомление -->
   <div class="notification" id="notif">
-    Данный специалист не является сотрудником, или проверьте правильность написания
+    Ushbu mutaxassis xodim emas yoki yozishda xatolik bor
   </div>
 
-  <!-- Модальное окно -->
   <div class="modal" id="resultModal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">x</span>
+      <span class="close" onclick="closeModal()">×</span>
       <div class="info" id="employeeInfo"></div>
     </div>
   </div>
 
   <script>
-    // Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
     }
@@ -264,7 +259,7 @@
           };
         });
       })
-      .catch(() => showNotification('Ошибка загрузки данных'));
+      .catch(() => showNotification("Ma'lumotlar yuklashda xatolik"));
 
     function formatId(id) {
       return '№' + id.slice(0,2) + '-' + id.slice(2,4) + '-' + id.slice(4,6);
@@ -279,7 +274,7 @@
       return time >= 420 && time < 1200;
     }
 
-    function showNotification(text = 'Данный специалист не является сотрудником, или проверьте правильность написания') {
+    function showNotification(text = "Ushbu mutaxassis xodim emas yoki yozishda xatolik bor") {
       const notif = document.getElementById('notif');
       notif.textContent = text;
       notif.classList.add('show');
@@ -289,7 +284,7 @@
     function performSearch() {
       const query = document.getElementById('search').value.trim();
       if (!query) {
-        showNotification('Введите данные специалиста');
+        showNotification("Mutaxassis ma'lumotlarini kiriting");
         return;
       }
 
@@ -301,7 +296,7 @@
       } else {
         const words = query.trim().split(/\s+/);
         if (words.length < 2) {
-          showNotification('Введите фамилию и имя (или хотя бы 3 буквы имени)');
+          showNotification("Familiya va ismni kiriting (yoki ismning kamida 3 harfi)");
           return;
         }
 
@@ -327,19 +322,19 @@
 
       const working = isWorkingNow();
       const statusText = working
-        ? 'В данный момент специалист находится на рабочем месте'
-        : 'В данный момент специалист отсутствует на рабочем месте';
+        ? "Hozirda mutaxassis ish joyida"
+        : "Hozirda mutaxassis ish joyida yo'q";
 
       const statusClass = working ? 'working' : 'off';
 
       document.getElementById('employeeInfo').innerHTML = `
-        <strong>Информация о сотруднике</strong><br><br>
-        Имя: ${found.fullName}<br>
-        Номер записи: ${formatId(found.id)}<br>
-        Должность: ${found.position}<br>
-        Департамент: ${found.dept}<br>
-        Стаж: ${found.expTotal}<br>
-        Стаж на данной должности: ${found.expPos}<br>
+        <strong>Xodim haqida ma'lumot</strong><br><br>
+        FISH: ${found.fullName}<br>
+        Yozuv raqami: ${formatId(found.id)}<br>
+        Lavozimi: ${found.position}<br>
+        Bo'lim: ${found.dept}<br>
+        Umumiy staj: ${found.expTotal}<br>
+        Ushbu lavozimdagi staj: ${found.expPos}<br>
         <div class="status ${statusClass}">${statusText}</div>
       `;
 
@@ -350,16 +345,13 @@
       document.getElementById('resultModal').style.display = 'none';
     }
 
-    // УМНАЯ КНОПКА "Вернуться в Telegram"
     function closeWebApp() {
       const isTelegram = window.Telegram && window.Telegram.WebApp;
 
       if (isTelegram) {
-        // Это Mini App — закрываем
         window.Telegram.WebApp.close();
       }
 
-      // Через 500 мс — если не закрылось (браузер), переходим в бот
       setTimeout(() => {
         if (!isTelegram || document.visibilityState !== 'hidden') {
           window.location.href = 'https://t.me/MarkaziybankiOZbot';
