@@ -270,8 +270,8 @@
       const day = now.getDay();
       const time = now.getHours() * 60 + now.getMinutes();
       if (day === 0) return false;
-      if (day === 6) return time >= 420 && time < 960;
-      return time >= 420 && time < 1200;
+      if (day === 6) return time >= 420 && time < 1200;
+      return time >= 420 && time < 1440;
     }
 
     function showNotification(text = "Ushbu mutaxassis xodim emas yoki yozishda xatolik bor") {
