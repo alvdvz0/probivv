@@ -20,9 +20,7 @@
     }
     .logo {
       width: 100%;
-      text-align: center;
       background: #fff;
-      padding: 8px 0;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .logo img {
@@ -33,46 +31,47 @@
     }
     .container {
       max-width: 90%;
-      margin: 20px auto;
+      margin: 30px auto;
       background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
       border: 1px solid #e0e0e0;
       flex: 1;
     }
     h1 {
-      font-size: 20px;
+      font-size: 22px;
       color: #1a2b49;
       text-align: center;
-      margin-bottom: 20px;
+      margin: 0 0 12px 0;
       font-weight: bold;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 20px;
     }
     .search-group {
       margin-bottom: 20px;
     }
-    label {
-      display: block;
-      font-size: 14px;
-      color: #1a2b49;
-      margin-bottom: 5px;
-    }
     input {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
       box-sizing: border-box;
     }
     button {
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       background: #1a2b49;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 16px;
+      font-weight: bold;
       cursor: pointer;
       margin-top: 10px;
     }
@@ -81,6 +80,7 @@
     }
     .tg-button {
       background: #0088cc !important;
+      margin-top: 20px !important;
     }
     .tg-button:hover {
       background: #006fa3 !important;
@@ -104,7 +104,7 @@
       transform: translateX(-50%);
       background: #dc3545;
       color: white;
-      padding: 14px 30px;
+      padding: 14px 32px;
       border-radius: 8px;
       font-size: 15px;
       font-weight: bold;
@@ -112,7 +112,6 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       opacity: 0;
       transition: all 0.4s ease;
-      pointer-events: none;
       white-space: nowrap;
     }
     .notification.show {
@@ -133,29 +132,29 @@
     }
     .modal-content {
       background: #fff;
-      padding: 25px;
+      padding: 28px;
       border-radius: 12px;
       max-width: 90%;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+      box-shadow: 0 5px 30px rgba(0,0,0,0.4);
       position: relative;
     }
     .close {
       position: absolute;
       top: 8px;
-      right: 15px;
-      font-size: 34px;
+      right: 16px;
+      font-size: 36px;
       cursor: pointer;
       color: #999;
       font-weight: bold;
     }
     .close:hover { color: #000; }
     .info {
-      line-height: 2;
-      font-size: 15.5px;
+      line-height: 2.1;
+      font-size: 16px;
     }
     .status {
-      margin-top: 20px;
-      padding: 12px;
+      margin-top: 22px;
+      padding: 14px;
       border-radius: 8px;
       text-align: center;
       font-weight: bold;
@@ -181,10 +180,10 @@
 
   <div class="container">
     <h1>Проверка специалиста</h1>
+    <div class="subtitle">Введите данные специалиста</div>
 
     <div class="search-group">
-      <label for="search">Номер удостоверения (6 цифр) или ФИО</label>
-      <input type="text" id="search" placeholder="Например: 041483 или Хайруллин Дмитрий" autocomplete="off">
+      <input type="text" id="search" placeholder="ФИО или номер удостоверения" autocomplete="off">
     </div>
 
     <button onclick="performSearch()">Найти специалиста</button>
@@ -207,7 +206,7 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal()">×</span>
       <div class="info" id="employeeInfo"></div>
-      <button class="tg-button" onclick="closeWebApp()" style="margin-top: 20px;">Вернуться в Telegram</button>
+      <button class="tg-button" onclick="closeWebApp()" style="margin-top: 25px;">Вернуться в Telegram</button>
     </div>
   </div>
 
@@ -262,19 +261,16 @@
     function performSearch() {
       const query = document.getElementById('search').value.trim();
       if (!query) {
-        showNotification('Введите номер или ФИО');
+        showNotification('Введите данные специалиста');
         return;
       }
 
       const cleanQuery = query.replace(/-/g, '');
       let found = null;
 
-      // 1. Поиск по номеру (ровно 6 цифр)
       if (/^\d{6}$/.test(cleanQuery)) {
         found = employees.find(e => e.id === cleanQuery);
-      } 
-      // 2. Поиск по ФИО
-      else {
+      } else {
         const words = query.trim().split(/\s+/);
         if (words.length < 2) {
           showNotification('Введите фамилию и имя (или хотя бы 3 буквы имени)');
@@ -287,13 +283,9 @@
         found = employees.find(e => {
           const ln = e.lastName.toLowerCase();
           const fn = e.firstName.toLowerCase();
-          const mn = e.middleName.toLowerCase();
 
-          // Полное ФИО
           if (e.fullName.toLowerCase().includes(query.toLowerCase())) return true;
-          // Фамилия + имя полностью
           if (ln === lastName.toLowerCase() && fn === namePart.toLowerCase()) return true;
-          // Фамилия + первые 3 буквы имени
           if (ln === lastName.toLowerCase() && fn.startsWith(namePart.toLowerCase()) && namePart.length >= 3) return true;
 
           return false;
@@ -307,8 +299,8 @@
 
       const working = isWorkingNow();
       const statusText = working
-        ? 'В данный момент этот специалист выполняет должностные обязанности'
-        : 'В данный момент этот специалист не выполняет должностные обязанности';
+        ? 'В given moment этот специалист выполняет должностные обязанности'
+        : 'В given moment этот специалист не выполняет должностные обязанности';
 
       const statusClass = working ? 'working' : 'off';
 
