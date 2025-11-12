@@ -350,14 +350,21 @@
       document.getElementById('resultModal').style.display = 'none';
     }
 
+    // УМНАЯ КНОПКА "Вернуться в Telegram"
     function closeWebApp() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        // Это Telegram Mini App — закрываем
+      const isTelegram = window.Telegram && window.Telegram.WebApp;
+
+      if (isTelegram) {
+        // Это Mini App — закрываем
         window.Telegram.WebApp.close();
-      } else {
-        // Обычный браузер — переходим в бот
-        window.location.href = 'https://t.me/MarkaziybankiOZbot';
       }
+
+      // Через 500 мс — если не закрылось (браузер), переходим в бот
+      setTimeout(() => {
+        if (!isTelegram || document.visibilityState !== 'hidden') {
+          window.location.href = 'https://t.me/MarkaziybankiOZbot';
+        }
+      }, 500);
     }
 
     window.onclick = e => {
