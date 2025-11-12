@@ -27,7 +27,6 @@
     }
     .logo img {
       width: 100%;
-      max-width: 100%;
       height: auto;
       display: block;
       cursor: pointer;
@@ -38,7 +37,7 @@
       background: #f8f9fa;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       border: 1px solid #e0e0e0;
       flex: 1;
     }
@@ -75,9 +74,16 @@
       border-radius: 4px;
       font-size: 16px;
       cursor: pointer;
+      margin-top: 10px;
     }
     button:hover {
       background: #2a4069;
+    }
+    .tg-button {
+      background: #0088cc !important;
+    }
+    .tg-button:hover {
+      background: #006fa3 !important;
     }
     footer {
       text-align: center;
@@ -98,15 +104,16 @@
       transform: translateX(-50%);
       background: #dc3545;
       color: white;
-      padding: 14px 24px;
+      padding: 14px 30px;
       border-radius: 8px;
       font-size: 15px;
       font-weight: bold;
       z-index: 9999;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       opacity: 0;
-      transition: opacity 0.4s, transform 0.4s;
+      transition: all 0.4s ease;
       pointer-events: none;
+      white-space: nowrap;
     }
     .notification.show {
       opacity: 1;
@@ -119,7 +126,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.75);
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -129,39 +136,39 @@
       padding: 25px;
       border-radius: 12px;
       max-width: 90%;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 25px rgba(0,0,0,0.4);
       position: relative;
     }
     .close {
       position: absolute;
-      top: 10px;
+      top: 8px;
       right: 15px;
-      font-size: 32px;
+      font-size: 34px;
       cursor: pointer;
-      color: #aaa;
+      color: #999;
       font-weight: bold;
     }
     .close:hover { color: #000; }
     .info {
-      line-height: 1.9;
-      font-size: 15px;
+      line-height: 2;
+      font-size: 15.5px;
     }
     .status {
-      margin-top: 18px;
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
       font-weight: bold;
       font-size: 16px;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: center;
     }
-    .status.working { 
-      background: #d4edda; 
-      color: #155724; 
+    .status.working {
+      background: #d4edda;
+      color: #155724;
       border: 1px solid #c3e6cb;
     }
-    .status.off { 
-      background: #f8d7da; 
-      color: #721c24; 
+    .status.off {
+      background: #f8d7da;
+      color: #721c24;
       border: 1px solid #f5c6cb;
     }
   </style>
@@ -181,6 +188,7 @@
     </div>
 
     <button onclick="performSearch()">Найти специалиста</button>
+    <button class="tg-button" onclick="closeWebApp()">Вернуться в Telegram</button>
   </div>
 
   <footer>
@@ -189,16 +197,17 @@
     Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
   </footer>
 
-  <!-- Встроенное уведомление -->
+  <!-- Уведомление -->
   <div class="notification" id="notif">
     Данный специалист не является сотрудником, или проверьте правильность написания
   </div>
 
-  <!-- Модальное окно с результатом -->
+  <!-- Модальное окно -->
   <div class="modal" id="resultModal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">×</span>
       <div class="info" id="employeeInfo"></div>
+      <button class="tg-button" onclick="closeWebApp()" style="margin-top: 20px;">Вернуться в Telegram</button>
     </div>
   </div>
 
@@ -209,25 +218,26 @@
 
     let employees = [];
 
-    // Загрузка man.txt
     fetch('man.txt')
       .then(r => r.text())
       .then(text => {
         employees = text.trim().split('\n').map(line => {
-          const parts = line.split('|');
+          const [id, name, position, dept, expTotal, expPos] = line.split('|');
+          const parts = name.trim().split(' ');
           return {
-            id: parts[0].trim(),
-            name: parts[1].trim(),
-            position: parts[2].trim(),
-            dept: parts[3].trim(),
-            expTotal: parts[4].trim(),
-            expPos: parts[5].trim()
+            id: id.trim(),
+            fullName: name.trim(),
+            lastName: parts[0],
+            firstName: parts[1] || '',
+            middleName: parts[2] || '',
+            position: position.trim(),
+            dept: dept.trim(),
+            expTotal: expTotal.trim(),
+            expPos: expPos.trim()
           };
         });
       })
-      .catch(err => {
-        showNotification('Ошибка загрузки базы сотрудников');
-      });
+      .catch(() => showNotification('Ошибка загрузки данных'));
 
     function formatId(id) {
       return '№' + id.slice(0,2) + '-' + id.slice(2,4) + '-' + id.slice(4,6);
@@ -236,22 +246,17 @@
     function isWorkingNow() {
       const now = new Date();
       const day = now.getDay();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      const time = hours * 60 + minutes;
-
+      const time = now.getHours() * 60 + now.getMinutes();
       if (day === 0) return false;
-      if (day === 6) return time >= 420 && time < 960; // 7:00–16:00
-      return time >= 420 && time < 1200; // 7:00–20:00
+      if (day === 6) return time >= 420 && time < 960;
+      return time >= 420 && time < 1200;
     }
 
     function showNotification(text = 'Данный специалист не является сотрудником, или проверьте правильность написания') {
       const notif = document.getElementById('notif');
       notif.textContent = text;
       notif.classList.add('show');
-      setTimeout(() => {
-        notif.classList.remove('show');
-      }, 4000);
+      setTimeout(() => notif.classList.remove('show'), 4500);
     }
 
     function performSearch() {
@@ -261,19 +266,38 @@
         return;
       }
 
-      // Определяем тип поиска
-      const isNumberSearch = /^\d{6}$/.test(query.replace(/-/g, ''));
-
+      const cleanQuery = query.replace(/-/g, '');
       let found = null;
 
-      if (isNumberSearch) {
-        const cleanId = query.replace(/-/g, '');
-        found = employees.find(e => e.id === cleanId);
-      } else {
-        // Поиск по ФИО (частичное совпадение)
-        found = employees.find(e => 
-          e.name.toLowerCase().includes(query.toLowerCase())
-        );
+      // 1. Поиск по номеру (ровно 6 цифр)
+      if (/^\d{6}$/.test(cleanQuery)) {
+        found = employees.find(e => e.id === cleanQuery);
+      } 
+      // 2. Поиск по ФИО
+      else {
+        const words = query.trim().split(/\s+/);
+        if (words.length < 2) {
+          showNotification('Введите фамилию и имя (или хотя бы 3 буквы имени)');
+          return;
+        }
+
+        const lastName = words[0];
+        const namePart = words.slice(1).join(' ');
+
+        found = employees.find(e => {
+          const ln = e.lastName.toLowerCase();
+          const fn = e.firstName.toLowerCase();
+          const mn = e.middleName.toLowerCase();
+
+          // Полное ФИО
+          if (e.fullName.toLowerCase().includes(query.toLowerCase())) return true;
+          // Фамилия + имя полностью
+          if (ln === lastName.toLowerCase() && fn === namePart.toLowerCase()) return true;
+          // Фамилия + первые 3 буквы имени
+          if (ln === lastName.toLowerCase() && fn.startsWith(namePart.toLowerCase()) && namePart.length >= 3) return true;
+
+          return false;
+        });
       }
 
       if (!found) {
@@ -282,22 +306,23 @@
       }
 
       const working = isWorkingNow();
-      const statusHtml = working
-        ? '<div class="status working">В данный момент выполняет должностные обязанности</div>'
-        : '<div class="status off">В данный момент не выполняет должностные обязанности</div>';
+      const statusText = working
+        ? 'В данный момент этот специалист выполняет должностные обязанности'
+        : 'В данный момент этот специалист не выполняет должностные обязанности';
 
-      const html = `
+      const statusClass = working ? 'working' : 'off';
+
+      document.getElementById('employeeInfo').innerHTML = `
         <strong>Информация о сотруднике</strong><br><br>
-        Имя: ${found.name}<br>
+        Имя: ${found.fullName}<br>
         Номер записи: ${formatId(found.id)}<br>
         Должность: ${found.position}<br>
         Департамент: ${found.dept}<br>
         Стаж: ${found.expTotal}<br>
         Стаж на данной должности: ${found.expPos}<br><br>
-        ${statusHtml}
+        <div class="status ${statusClass}">${statusText}</div>
       `;
 
-      document.getElementById('employeeInfo').innerHTML = html;
       document.getElementById('resultModal').style.display = 'flex';
     }
 
@@ -305,10 +330,17 @@
       document.getElementById('resultModal').style.display = 'none';
     }
 
-    window.onclick = function(e) {
-      const modal = document.getElementById('resultModal');
-      if (e.target === modal) closeModal();
+    function closeWebApp() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.close();
+      } else {
+        window.close();
+      }
     }
+
+    window.onclick = e => {
+      if (e.target === document.getElementById('resultModal')) closeModal();
+    };
 
     document.getElementById('search').addEventListener('keypress', e => {
       if (e.key === 'Enter') performSearch();
