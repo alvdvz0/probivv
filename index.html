@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Обращение в ЦБ РУз</title>
+  <title>Проверка специалиста ЦБ РУз</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -39,6 +39,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       border: 1px solid #e0e0e0;
+      flex: 1;
     }
     h1 {
       font-size: 20px;
@@ -47,8 +48,8 @@
       margin-bottom: 20px;
       font-weight: bold;
     }
-    .form-group {
-      margin-bottom: 15px;
+    .search-group {
+      margin-bottom: 20px;
     }
     label {
       display: block;
@@ -56,25 +57,17 @@
       color: #1a2b49;
       margin-bottom: 5px;
     }
-    select, input, textarea {
+    input {
       width: 100%;
-      padding: 10px;
-      font-size: 14px;
+      padding: 12px;
+      font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 4px;
       box-sizing: border-box;
     }
-    select:disabled, input:disabled {
-      background: #e0e0e0;
-      cursor: not-allowed;
-    }
-    textarea {
-      resize: none;
-      height: 100px;
-    }
     button {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       background: #1a2b49;
       color: #fff;
       border: none;
@@ -90,236 +83,177 @@
       padding: 20px;
       font-size: 12px;
       color: #666;
-      margin-top: auto;
     }
     footer a {
       color: #1a2b49;
       text-decoration: none;
     }
-    .notification {
+    .modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
+      z-index: 1000;
     }
-    .notification-content {
+    .modal-content {
       background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      position: relative;
     }
-    .notification-content button {
-      margin-top: 10px;
-      background: #1a2b49;
-    }
-    .copyable {
-      font-family: 'Courier New', monospace;
-      background: #f8f9fa;
-      padding: 2px 4px;
-      border-radius: 2px;
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
       cursor: pointer;
-      display: inline-block;
+      color: #aaa;
     }
-    .copyable:hover {
-      background: #e8e8e8;
+    .close:hover { color: #000; }
+    .info {
+      line-height: 1.8;
+      font-size: 15px;
     }
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .status.working { color: #28a745; }
+    .status.off { color: #dc3545; }
   </style>
 </head>
 <body>
+
   <div class="logo">
     <img src="лого.jpg" alt="ЦБ РУз" onclick="window.location.href='https://cbu.uz/ru/'">
   </div>
+
   <div class="container">
-    <h1>Отправить обращение</h1>
-    <div class="form-group">
-      <label>Территориальное подразделение</label>
-      <select disabled>
-        <option>Центральный аппарат ЦБ</option>
-      </select>
+    <h  >Проверка специалиста</h1>
+
+    <div class="search-group">
+      <label for="search">Номер удостоверения или ФИО</label>
+      <input type="text" id="search" placeholder="Например: 041483 или Хайруллин Дмитрий">
     </div>
-    <div class="form-group">
-      <label>Департамент</label>
-      <select disabled>
-        <option>Департамент Безопасности</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>ФИО заявителя</label>
-      <input type="text" id="fio" placeholder="Введите ФИО">
-    </div>
-    <div class="form-group">
-      <label>Цель обращения</label>
-      <select id="purpose" onchange="togglePurposeField()">
-        <option value="Связь со специалистом" selected>Связь со специалистом</option>
-        <option value="Задать вопрос">Задать вопрос</option>
-        <option value="Предложения">Предложения</option>
-        <option value="Обращение в поддержку">Обращение в поддержку</option>
-      </select>
-    </div>
-    <div class="form-group" id="specialist-field">
-      <label>Табельный номер специалиста</label>
-      <input type="text" id="specialist-number" placeholder="Введите номер">
-    </div>
-    <div class="form-group" id="question-field" style="display: none;">
-      <label>Укажите вопрос</label>
-      <textarea id="question" placeholder="Введите ваш вопрос или предложение"></textarea>
-    </div>
-    <button onclick="submitRequest()">Отправить запрос</button>
+
+    <button onclick="performSearch()">Найти специалиста</button>
   </div>
+
   <footer>
     © 2005–2025<br>
     Центральный банк Республики Узбекистан, официальный сайт.<br>
     Дизайн и разработка сайта <a href="https://pixelcraft.uz/">Pixelcraft</a>
   </footer>
-  <div class="notification" id="notification">
-    <div class="notification-content">
-      <p id="notification-text">Спасибо за обращение</p>
-      <button onclick="closeWebApp()">Вернуться в бот</button>
+
+  <!-- Модальное окно с результатом -->
+  <div class="modal" id="resultModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="info" id="employeeInfo"></div>
     </div>
   </div>
 
   <script>
-    // Проверка, что страница открыта как Telegram Web App
-    if (!window.Telegram || !window.Telegram.WebApp) {
-      document.body.innerHTML = '<h1>Ошибка: Доступ возможен только через Telegram</h1>';
-      throw new Error('This page can only be accessed as a Telegram Web App');
+    // Проверка Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
     }
 
-    // Инициализация Telegram Web App
-    window.Telegram.WebApp.ready();
+    let employees = [];
 
-    function togglePurposeField() {
-      const purpose = document.getElementById('purpose').value;
-      const specialistField = document.getElementById('specialist-field');
-      const questionField = document.getElementById('question-field');
-      if (purpose === 'Связь со специалистом') {
-        specialistField.style.display = 'block';
-        questionField.style.display = 'none';
-      } else {
-        specialistField.style.display = 'none';
-        questionField.style.display = 'block';
-      }
-    }
-
-    // Функция для копирования текста
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Скопировано!');
-      }).catch(err => {
-        console.error('Ошибка копирования: ', err);
+    // Загрузка базы man.txt
+    fetch('man.txt')
+      .then(r => r.text())
+      .then(text => {
+        employees = text.trim().split('\n').map(line => {
+          const [id, name, position, dept, expTotal, expPos] = line.split('|');
+          return { id, name: name.trim(), position: position.trim(), dept: dept.trim(), expTotal: expTotal.trim(), expPos: expPos.trim() };
+        });
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки man.txt:', err);
+        alert('Не удалось загрузить базу сотрудников');
       });
+
+    function formatId(id) {
+      return '№' + id.slice(0,2) + '-' + id.slice(2,4) + '-' + id.slice(4,6);
     }
 
-    async function submitRequest() {
-      const fio = document.getElementById('fio').value.trim();
-      const purpose = document.getElementById('purpose').value;
-      const specialistNumber = document.getElementById('specialist-number').value.trim();
-      const question = document.getElementById('question').value.trim();
-      const botToken = '7571144445:AAHZD5LCp81Taf-dgPo2Jw894rz1JqbdgI4';
-      const defaultChatId = '7048297998';
+    function isWorkingNow() {
+      const now = new Date();
+      const day = now.getDay(); // 0 = воскресенье
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const time = hours * 60 + minutes;
 
-      if (!fio) {
-        alert('Пожалуйста, введите ФИО');
+      if (day === 0) return false; // воскресенье
+      if (day === 6) { // суббота
+        return time >= 7*60 && time < 16*60;
+      }
+      // будни
+      return time >= 7*60 && time < 20*60;
+    }
+
+    function performSearch() {
+      const query = document.getElementById('search').value.trim();
+      if (!query) {
+        alert('Введите номер удостоверения или ФИО');
         return;
       }
 
-      // Получение данных пользователя из Telegram
-      const user = window.Telegram.WebApp.initDataUnsafe.user || {};
-      const chatId = user.id || '';
-      const username = user.username || 'Не указано';
-      const userLink = user.username ? `t.me/${user.username}` : 'Не указано';
+      const found = employees.find(emp => {
+        const byId = emp.id === query.replace(/-/g, '');
+        const byName = emp.name.toLowerCase().includes(query.toLowerCase());
+        return byId || byName;
+      });
 
-      let message = `🆕 Новое обращение:\n\n`;
-      message += `👤 ФИО: <code class="copyable" onclick="copyToClipboard('${fio}')">${fio}</code>\n`;
-      message += `🎯 Цель: ${purpose}\n`;
-      let targetChatId = defaultChatId;
-      let responseMessage = '✅ Ваше обращение обрабатывается, ожидайте ответа в ближайшее время.';
-      let userChatId = chatId.toString();
-      let keyboard = null;
-
-      if (purpose === 'Связь со специалистом' && specialistNumber) {
-        message += `🆔 Табельный номер: ${specialistNumber}\n`;
-        if (specialistNumber === '041483') {
-          targetChatId = '7698094195';
-          responseMessage = '👨‍💼 Специалист Департамента Безопасности Хайруллин Дмитрий Шамилевич';
-          keyboard = {
-            inline_keyboard: [[
-              {
-                text: '📞 Перейти в чат',
-                url: 'https://t.me/Markaziy_banki123'
-              }
-            ]]
-          };
-        } else if (specialistNumber === '112437') {
-          targetChatId = '938263475';
-          responseMessage = '👨‍💼 Специалист Департамента Безопасности Рымкулов Бахыт Алимжанович';
-          keyboard = {
-            inline_keyboard: [[
-              {
-                text: '📞 Перейти в чат',
-                url: 'https://t.me/Afferist132'
-              }
-            ]]
-          };
-        }
-      } else if (purpose !== 'Связь со специалистом' && !question) {
-        alert('Пожалуйста, введите вопрос или предложение');
+      if (!found) {
+        alert('Сотрудник не найден');
         return;
-      } else {
-        message += `❓ Вопрос/Предложение: ${question}\n`;
       }
 
-      message += `\n📱 Chat ID: <code class="copyable" onclick="copyToClipboard('${userChatId}')">${userChatId}</code>\n`;
-      message += `🔗 Ссылка: ${userLink}\n`;
-      message += `👤 Имя аккаунта: ${username}`;
+      const working = isWorkingNow();
+      const statusText = working 
+        ? '<span class="status working">В данный момент выполняет должностные обязанности</span>'
+        : '<span class="status off">В данный момент не выполняет должностные обязанности</span>';
 
-      // Отправка сообщения специалисту/поддержке
-      try {
-        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: targetChatId,
-            text: message,
-            parse_mode: 'HTML',
-            disable_web_page_preview: true
-          })
-        });
-      } catch (error) {
-        console.error('Ошибка отправки специалисту:', error);
-      }
+      const html = `
+        <strong>Информация о сотруднике</strong><br><br>
+        Имя: ${found.name}<br>
+        Номер записи: ${formatId(found.id)}<br>
+        Должность: ${found.position}<br>
+        Департамент: ${found.dept}<br>
+        Стаж: ${found.expTotal}<br>
+        Стаж на данной должности: ${found.expPos}<br><br>
+        ${statusText}
+      `;
 
-      // Отправка ответа клиенту
-      try {
-        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: userChatId,
-            text: responseMessage,
-            parse_mode: 'HTML',
-            reply_markup: keyboard ? JSON.stringify(keyboard) : undefined,
-            disable_web_page_preview: true
-          })
-        });
+      document.getElementById('employeeInfo').innerHTML = html;
+      document.getElementById('resultModal').style.display = 'flex';
+    }
 
-        // Показ локального уведомления
-        document.getElementById('notification-text').innerText = 'Спасибо за обращение!';
-        document.getElementById('notification').style.display = 'flex';
-      } catch (error) {
-        console.error('Ошибка отправки клиенту:', error);
-        alert('Ошибка при отправке ответа. Попробуйте позже.');
+    function closeModal() {
+      document.getElementById('resultModal').style.display = 'none';
+    }
+
+    // Закрытие по клику вне окна
+    window.onclick = function(e) {
+      const modal = document.getElementById('resultModal');
+      if (e.target === modal) {
+        modal.style.display = 'none';
       }
     }
 
-    function closeWebApp() {
-      window.Telegram.WebApp.close();
-    }
+    // Enter в поле поиска
+    document.getElementById('search').addEventListener('keypress', e => {
+      if (e.key === 'Enter') performSearch();
+    });
   </script>
 </body>
 </html>
