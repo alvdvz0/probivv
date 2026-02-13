@@ -9,8 +9,6 @@
 002352|Karimov Otabek Azizovich|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
 474702|Volkov Aleksandr Anatolyevich|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
 355259|Raxmatullayev Ali Shuxratovich|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil, 4 oy|10 oy|
-003512|Ponomaryova Granetta Grigoryevna|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|7 yil|5 yil 2 oy|
-003512|Ponomaryova Granetta Grigoryevna|Yuridik departament vakili|Yuridik departament|7 yil|5 yil 2 oy|
 004412|Muxamedova Madina Rustamovna|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil|2 yil 2 oy|
 845860|Musayev Alisher Tagirovich|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil|2 yil 2 oy|
 047083|Turdiyev Aziz Anvarovich|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil|2 yil 2 oy|
@@ -19,3 +17,4 @@
 145812|Xasanova Leyla Taxirovna|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil|2 yil 4 oy|
 051337|Axmedov Rustam Azamatovich|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil|3 yil 3 oy|
 014585|Zufarova Kamila Rustamovna|Jismoniy shaxslar bilan ishlash bo'yicha menejer|Xavfsizlik departamenti|3 yil|3 yil 3 oy|
+
